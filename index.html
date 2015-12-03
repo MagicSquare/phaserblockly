@@ -1,0 +1,224 @@
+<!doctype html>
+
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8" />
+		<title>Phaser - Blockly</title>
+		<script type="text/javascript" src="lib/phaser.min.js"></script>
+		<style type="text/css">
+			body
+			{
+				margin: 0;
+			}
+		</style>
+
+		<link href="css/bootstrap.min.css" rel="stylesheet">
+		<link href="css/BugSwarm.css" rel="stylesheet">
+
+		<script src="lib/blockly/blockly_compressed.js"></script>
+		<script src="lib/blockly/blocks_compressed.js"></script>
+		<script src="lib/blockly/javascript_compressed.js"></script>
+		<script src="lib/blockly/msg/js/fr.js"></script>
+		<script src="lib/acorn.js"></script>
+		<script src="lib/interpreter.js"></script>
+		<script src="lib/jquery-2.1.4.js"></script>
+		<script src="lib/bootstrap.min.js"></script>
+
+		<script src="js/bug_blocks.js"></script>
+
+	</head>
+
+	<body>
+
+		<script type="text/javascript">
+		
+		function Game()
+		{
+			this.m_Game = new Phaser.Game( 800, 600, Phaser.AUTO, '', { preload: preload, create: create, update: update } );
+			this.m_Platforms = null;
+			this.m_Player = null;
+			this.m_Cursors = null;
+			this.m_Stars = null;
+
+			this.m_Score = 0;
+			this.m_ScoreText = 'score: 0';
+
+			this.m_MoveLeft =  0;
+			this.m_MoveRight = 0;
+			this.m_Jump = 0;
+		}
+
+		/* Pointeur sur fonction */
+		var ms_OnBlocklyUpdate = new BlockInstructionEmpty();
+
+		var ms_Phaser = new Game();
+
+		function preload()
+		{
+			ms_Phaser.m_Game.load.image('sky', 'assets/sky.png');
+			ms_Phaser.m_Game.load.image('ground', 'assets/platform.png');
+			ms_Phaser.m_Game.load.image('star', 'assets/star.png');
+			ms_Phaser.m_Game.load.spritesheet('dude', 'assets/dude.png', 32, 48);
+		}
+
+		function create()
+		{
+			//  We're going to be using physics, so enable the Arcade Physics system
+			ms_Phaser.m_Game.physics.startSystem(Phaser.Physics.ARCADE);
+
+			//  A simple background for our game
+			ms_Phaser.m_Game.add.sprite(0, 0, 'sky');
+
+			//  The platforms group contains the ground and the 2 ledges we can jump on
+			ms_Phaser.m_Platforms = ms_Phaser.m_Game.add.group();
+
+			//  We will enable physics for any object that is created in this group
+			ms_Phaser.m_Platforms.enableBody = true;
+
+			// Here we create the ground.
+			var ground = ms_Phaser.m_Platforms.create(0, ms_Phaser.m_Game.world.height - 64, 'ground');
+
+			//  Scale it to fit the width of the game (the original sprite is 400x32 in size)
+			ground.scale.setTo(2, 2);
+
+			//  This stops it from falling away when you jump on it
+			ground.body.immovable = true;
+
+			//  Now let's create two ledges
+			var ledge = ms_Phaser.m_Platforms.create(400, 400, 'ground');
+
+			ledge.body.immovable = true;
+
+			ledge = ms_Phaser.m_Platforms.create(-150, 250, 'ground');
+
+			ledge.body.immovable = true;
+
+			// The player and its settings
+			ms_Phaser.m_Player = ms_Phaser.m_Game.add.sprite(32, ms_Phaser.m_Game.world.height - 150, 'dude');
+
+			//  We need to enable physics on the player
+			ms_Phaser.m_Game.physics.arcade.enable(ms_Phaser.m_Player);
+
+			//  Player physics properties. Give the little guy a slight bounce.
+			ms_Phaser.m_Player.body.bounce.y = 0.2;
+			ms_Phaser.m_Player.body.gravity.y = 300;
+			ms_Phaser.m_Player.body.collideWorldBounds = true;
+
+			//  Our two animations, walking left and right.
+			ms_Phaser.m_Player.animations.add('left', [0, 1, 2, 3], 10, true);
+			ms_Phaser.m_Player.animations.add('right', [5, 6, 7, 8], 10, true);
+
+			ms_Phaser.m_Cursors = ms_Phaser.m_Game.input.keyboard.createCursorKeys();
+
+			ms_Phaser.m_Stars = ms_Phaser.m_Game.add.group();
+
+			ms_Phaser.m_Stars.enableBody = true;
+
+			//  Here we'll create 12 of them evenly spaced apart
+			for (var i = 0; i < 12; i++)
+			{
+				//  Create a star inside of the 'stars' group
+				var star = ms_Phaser.m_Stars.create(i * 70, 0, 'star');
+
+				//  Let gravity do its thing
+				star.body.gravity.y = 6;
+
+				//  This just gives each star a slightly random bounce value
+				star.body.bounce.y = 0.7 + Math.random() * 0.2;
+			}
+
+			ms_Phaser.m_ScoreText = ms_Phaser.m_Game.add.text(16, 16, 'score: 0', { fontSize: '32px', fill: '#000' });
+		}
+
+		function update()
+		{
+			//  Collide the player and the stars with the platforms
+			ms_Phaser.m_Game.physics.arcade.collide( ms_Phaser.m_Player, ms_Phaser.m_Platforms );
+			ms_Phaser.m_Game.physics.arcade.collide( ms_Phaser.m_Stars, ms_Phaser.m_Platforms );
+			ms_Phaser.m_Game.physics.arcade.overlap( ms_Phaser.m_Player, ms_Phaser.m_Stars, collectStar, null, this);
+
+			if( ms_OnBlocklyUpdate )
+			{
+				if( !ms_OnBlocklyUpdate.go() )
+				{
+					ms_OnBlocklyUpdate = null;
+
+					nextStep();
+				}
+			}
+		}
+
+		function collectStar( player, star )
+		{
+			// Removes the star from the screen
+			star.kill();
+
+			//  Add and update the score
+			ms_Phaser.m_Score += 10;
+			ms_Phaser.m_ScoreText.text = 'Score: ' + ms_Phaser.m_Score;
+
+		}
+
+		</script>
+
+		<div id="workspace" style="position:fixed;left:50%;width:40%">
+			<div id="content">
+				<ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+					<li class="active"><a href="#red" data-toggle="tab">Blocks</a></li>
+					<li><a href="#orange" data-toggle="tab">Code</a></li>
+				</ul>
+				<div id="my-tab-content" class="tab-content" style="background-color:black">
+					<div class="tab-pane active" id="red">
+						<div id="blocklyDiv" style="height: 400px; width:100%; ">
+							<div style="float:right">
+								<button id="buildandrunButton">Build and run</button>
+								<button id="buildButton">Build</button>
+								<button id="stepButton" disabled="disabled">Step</button>
+								<button id="resetButton">Reset stage</button>
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane" style="height: 400px; width:100%;" id="orange">
+						<textarea id="consoleTextarea" rows="5" cols="50"></textarea>
+					</div>
+				</div>
+			</div>
+		</div>
+
+
+		<xml id="toolbox" style="display: none">
+			<block type="bug_move_left"></block>
+			<block type="bug_move_right"></block>
+			<block type="bug_jump"></block>
+			<block type="bug_wait"></block>
+			<block type="bug_controls_loop"></block>
+		</xml>
+
+		<script src="js/workspace.js"></script>
+
+		<script type="text/javascript">
+			jQuery(document).ready( function ($)
+			{
+				$('#tabs').tab();
+			});
+		</script>
+
+		<script>
+		$(function()
+		{
+			$(".meter > span").each( function()
+			{
+				$(this)
+				.data("origWidth", $(this).width())
+				.width(0)
+				.animate(
+				{
+					width: $(this).data("origWidth")
+				}, 1200 );
+			});
+		});
+		</script>
+
+	</body>
+</html>
