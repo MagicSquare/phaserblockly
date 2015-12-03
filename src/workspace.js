@@ -131,7 +131,11 @@ $( "#buildandrunButton" ).click( function()
 $( "#resetButton" ).click( function() 
 {	
 	if( ms_Phaser )
-		ms_Phaser.m_Game.state.start( "create", true, false );
+	{
+		ms_CounterStep = 0;
+		ms_OnBlocklyUpdate = null;
+		ms_Phaser.m_Game.state.start( ms_Phaser.m_Game.state.current );
+	}
 	
 });
 

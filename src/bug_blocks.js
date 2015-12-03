@@ -1,9 +1,7 @@
-/// Before to run the instructions reinit this one.
-///
+/** Before to run the instructions reinit this one. */
 var ms_CounterStep = 0;
 
-/// To show step by step mod
-///
+/** To show step by step mod */
 function getEndBlockCode()
 {
 	var aCounter = ms_CounterStep;
@@ -13,23 +11,31 @@ function getEndBlockCode()
 	return 'highlightBlock( ' + aCounter + ' );' ;
 }
 
-/// Template of an empty instruction
-///
+/** Template of an empty instruction 
+*	@class 
+*	@constructor
+*/
 function BlockInstructionEmpty()
 {
-	this.go = function()
+	/**	Each update the state class has to call the go function.
+	*
+	*	@param {object} [inState] - use that to access at the state variables.
+	*
+	* 	@method BlockInstructionEmpty#go
+	*/
+	this.go = function( inState )
 	{
 		return false;
 	};
 }
 
-/// Template str basic instruction
-///
-/// @param inMembers str members arrays
-///
-/// @param inStrFuncGo string function definition: Has to return false to close
-/// 				   the instruction
-///
+/** Template str basic instruction
+*
+*	@param {string[]} [inMembers] - str members arrays
+*
+*   @param {string} [inStrFuncGo] string function definition: Has to return false to close
+* 				                the instruction
+*/
 function getStrBlockInstruction( inMembers, inStrFuncGo )
 {
 	var aResult = "";
@@ -42,7 +48,7 @@ function getStrBlockInstruction( inMembers, inStrFuncGo )
 		aResult += "this." + inMembers[i] + ";"
 	}
 	
-	aResult +=	  	"this.go = function()";
+	aResult +=	  	"this.go = function( inState )";
 	aResult += 		"{";
 	aResult += 			inStrFuncGo;
 	aResult += 		"};";
@@ -51,22 +57,23 @@ function getStrBlockInstruction( inMembers, inStrFuncGo )
 	return aResult;
 }
 
-/// Create a basic class instructions
-///
-/// @param inMembers array of members example : ["m_Count=10"]
-///
-/// @param inStrFuncGo go str function example : 
-///	aGoFunc =  "if( 0 < this.m_Count )"
-///	aGoFunc += "{"
-///	aGoFunc +=		"ms_Phaser.m_Player.body.velocity.y = -350;"
-///	aGoFunc +=      "this.m_Count--;"					
-///	aGoFunc +=		"return true;" // It's not the instruction end. We have to continue.
-///	aGoFunc += "}"
-///	aGoFunc += "else"
-///	aGoFunc += "{"
-///	aGoFunc +=		"return false;" // Instruction end.
-///	aGoFunc += "}"
-///
+/** Create a basic class instructions
+*	
+*	@param {string[]} [inMembers array] of members example : ["m_Count=10"]
+*	
+*	@param {string} [inStrFuncGo] go str function example : 
+*
+*		   aGoFunc =  "if( 0 < this.m_Count )"
+*		   aGoFunc += "{"
+*		   aGoFunc +=		"inState.m_Player.body.velocity.y = -350;"
+*		   aGoFunc +=      "this.m_Count--;"					
+*		   aGoFunc +=		"return true;" // It's not the instruction end. We have to continue.
+*		   aGoFunc += "}"
+*		   aGoFunc += "else"
+*		   aGoFunc += "{"
+*		   aGoFunc +=		"return false;" // Instruction end.
+*		   aGoFunc += "}"
+*/
 function CreateBasicFunction( inMembers, inStrFuncGo )
 {
 	var aGoFunc = 'ms_OnBlocklyUpdate = new ' + getStrBlockInstruction( inMembers, inStrFuncGo ) + ';' ;
@@ -81,8 +88,7 @@ function CreateBasicFunction( inMembers, inStrFuncGo )
 	return aResult;
 }
 
-/// Move Left @see index.html toolbox
-///
+/** Move Left @see index.html toolbox */
 Blockly.Blocks['bug_move_left'] =
 {
 	init: function()
@@ -108,27 +114,26 @@ Blockly.JavaScript['bug_move_left'] = function(block)
 
 	var aGoFunc = ""
 	
-	aGoFunc += "ms_Phaser.m_Player.body.velocity.x = 0;" //  Reset the players velocity (movement)
+	aGoFunc += "inState.m_Player.body.velocity.x = 0;" //  Reset the players velocity (movement)
 		
 	aGoFunc += "if( 0 < this.m_Count )"
 	aGoFunc += "{"		
-	aGoFunc += 		"ms_Phaser.m_Player.body.velocity.x = -150;" //  Move to the right
-	aGoFunc += 		"ms_Phaser.m_Player.animations.play('left');"
+	aGoFunc += 		"inState.m_Player.body.velocity.x = -150;" //  Move to the right
+	aGoFunc += 		"inState.m_Player.animations.play('left');"
 	aGoFunc +=      "this.m_Count--;"					
 	aGoFunc +=		"return true;"
 	aGoFunc += "}"
 	aGoFunc += "else"
 	aGoFunc += "{"		
-	aGoFunc += 		"ms_Phaser.m_Player.animations.stop();" //  Stand still
-	aGoFunc += 		"ms_Phaser.m_Player.frame = 4;"
+	aGoFunc += 		"inState.m_Player.animations.stop();" //  Stand still
+	aGoFunc += 		"inState.m_Player.frame = 4;"
 	aGoFunc += 		"return false;"
 	aGoFunc += "}"
 
 	return CreateBasicFunction( aMembers, aGoFunc );
 };
 
-/// Move Right @see index.html toolbox
-///
+/** Move Right @see index.html toolbox */
 Blockly.Blocks['bug_move_right'] =
 {
 	init: function()
@@ -154,27 +159,26 @@ Blockly.JavaScript['bug_move_right'] = function(block)
 
 	var aGoFunc = ""
 		
-	aGoFunc += "ms_Phaser.m_Player.body.velocity.x = 0;" //  Reset the players velocity (movement)
+	aGoFunc += "inState.m_Player.body.velocity.x = 0;" //  Reset the players velocity (movement)
 			
 	aGoFunc += "if( 0 < this.m_Count )"
 	aGoFunc += "{"		
-	aGoFunc += 		"ms_Phaser.m_Player.body.velocity.x = 150;" //  Move to the right
-	aGoFunc += 		"ms_Phaser.m_Player.animations.play('right');"
+	aGoFunc += 		"inState.m_Player.body.velocity.x = 150;" //  Move to the right
+	aGoFunc += 		"inState.m_Player.animations.play('right');"
 	aGoFunc +=      "this.m_Count--;"					
 	aGoFunc +=		"return true;"
 	aGoFunc += "}"
 	aGoFunc += "else"
 	aGoFunc += "{"		
-	aGoFunc += 		"ms_Phaser.m_Player.animations.stop();" //  Stand still
-	aGoFunc += 		"ms_Phaser.m_Player.frame = 4;"
+	aGoFunc += 		"inState.m_Player.animations.stop();" //  Stand still
+	aGoFunc += 		"inState.m_Player.frame = 4;"
 	aGoFunc += 		"return false;"
 	aGoFunc += "}"
 
 	return CreateBasicFunction( aMembers, aGoFunc );
 };
 
-/// Jump @see index.html toolbox
-///
+/** Jump @see index.html toolbox */
 Blockly.Blocks['bug_jump'] =
 {
 	init: function()
@@ -203,22 +207,21 @@ Blockly.JavaScript['bug_jump'] = function(block)
 	
 	aGoFunc += "if( 0 < this.m_Count )"
 	aGoFunc += "{"
-	aGoFunc +=		"ms_Phaser.m_Player.body.velocity.y = -350;"
+	aGoFunc +=		"inState.m_Player.body.velocity.y = -350;"
 	aGoFunc +=      "this.m_Count--;"					
 	aGoFunc +=		"return true;"
 	aGoFunc += "}"
 	aGoFunc += "else"
 	aGoFunc += "{"					
-	aGoFunc +=		"ms_Phaser.m_Player.animations.stop();" //  Stand still
-	aGoFunc +=		"ms_Phaser.m_Player.frame = 4;"				
+	aGoFunc +=		"inState.m_Player.animations.stop();" //  Stand still
+	aGoFunc +=		"inState.m_Player.frame = 4;"				
 	aGoFunc +=		"return false;"
 	aGoFunc += "}"
 
 	return CreateBasicFunction( aMembers, aGoFunc );
 };
 
-/// Wait @see index.html toolbox
-///
+/** Wait @see index.html toolbox */
 Blockly.Blocks['bug_wait'] =
 {
 	init: function()
@@ -247,8 +250,8 @@ Blockly.JavaScript['bug_wait'] = function(block)
 	
 	aGoFunc += "if( 0 < this.m_Count )"
 	aGoFunc += "{"
-	aGoFunc +=		"ms_Phaser.m_Player.animations.stop();" //  Stand still
-	aGoFunc +=		"ms_Phaser.m_Player.frame = 4;"		
+	aGoFunc +=		"inState.m_Player.animations.stop();" //  Stand still
+	aGoFunc +=		"inState.m_Player.frame = 4;"		
 	aGoFunc +=      "this.m_Count--;"					
 	aGoFunc +=		"return true;"
 	aGoFunc += "}"
@@ -260,8 +263,7 @@ Blockly.JavaScript['bug_wait'] = function(block)
 	return CreateBasicFunction( aMembers, aGoFunc );
 };
 
-/// Move Loop @see index.html toolbox
-///
+/** Move Loop @see index.html toolbox */
 Blockly.Blocks['bug_controls_loop'] =
 {
 	init: function() 
