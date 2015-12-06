@@ -180,7 +180,7 @@ function copyBlockly() {
 /**
  * Copies lib folder into the './build/scripts' folder.
  */
-function copyLibInterpreter() {
+function copyLib() {
     var srcList = ['interpreter.js'];
 
     srcList = srcList.map(function (file) {
@@ -191,6 +191,20 @@ function copyLibInterpreter() {
         .pipe(gulp.dest(SCRIPTS_PATH));
 }
 
+/**
+ * Copies src folder into the './build/scripts' folder.
+ * SHOULD NOT EXIST
+ */
+function copySrcFake() {
+    var srcList = ['bug_blocks.js', 'workspace.js'];
+
+    srcList = srcList.map(function (file) {
+        return SOURCE_PATH + '/' + file;
+    });
+
+    return gulp.src(srcList)
+        .pipe(gulp.dest(SCRIPTS_PATH));
+}
 
 /**
  * Transforms ES2015 code into ES5 code.
@@ -257,8 +271,9 @@ gulp.task('copyBootstrapStyles', ['copyBootstrapScripts'], copyBootstrapStyles);
 gulp.task('copyJQuery', ['copyBootstrapStyles'], copyJQuery);
 gulp.task('copyAcorn', ['copyJQuery'], copyAcorn);
 gulp.task('copyBlockly', ['copyAcorn'], copyBlockly);
-gulp.task('copyLibInterpreter', ['copyBlockly'], copyLibInterpreter);
-gulp.task('build', ['copyLibInterpreter'], build);
+gulp.task('copyLib', ['copyBlockly'], copyLib);
+gulp.task('copySrcFake', ['copyLib'], copySrcFake);
+gulp.task('build', ['copySrcFake'], build);
 gulp.task('fastBuild', build);
 gulp.task('serve', ['build'], serve);
 gulp.task('watch-js', ['fastBuild'], browserSync.reload); // Rebuilds and reloads the project when executed.
