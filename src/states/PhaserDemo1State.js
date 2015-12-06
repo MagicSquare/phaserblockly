@@ -98,9 +98,9 @@ class PhaserDemo1State extends Phaser.State {
         this.game.physics.arcade.collide(this.m_Stars, this.m_Platforms);
         this.game.physics.arcade.overlap(this.m_Player, this.m_Stars, this.collectStar, null, this);
 
-        if (ms_OnBlocklyUpdate) {
-            if (!ms_OnBlocklyUpdate.go(this)) {
-                ms_OnBlocklyUpdate = null;
+        if (this.game.ms_OnBlocklyUpdate) {
+            if (!this.game.ms_OnBlocklyUpdate.go(this)) {
+                this.game.ms_OnBlocklyUpdate = null;
 
                 nextStep();
             }
