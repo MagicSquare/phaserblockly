@@ -16,44 +16,44 @@
 		<script src="lib/interpreter.js"></script>
 		<script src="lib/phaser.min.js"></script>
 
-		<script src="src/bug_blocks.js"></script>
-		<script src="src/boot.js"></script>
-		<script src="src/preloader.js"></script>
-		<script src="src/tree.js"></script>
-		<script src="src/phaser-demo1.js"></script>
-		<script src="src/glassmarbles.js"></script>
-		
+		<script src="dist/bug_blocks.js"></script>
+		<script src="dist/boot.js"></script>
+		<script src="dist/preloader.js"></script>
+		<script src="dist/tree.js"></script>
+		<script src="dist/phaser-demo1.js"></script>
+		<script src="dist/glassmarbles.js"></script>
+
 		<link href="css/bootstrap.min.css" rel="stylesheet">
 		<link href="css/BugSwarm.css" rel="stylesheet">
-		
+
 		<style type="text/css">
 			body
 			{
 				margin: 0;
 			}
 		</style>
-		
+
 	</head>
 
 	<body>
 
 		<script type="text/javascript">
-		
+
 			/** Pointeur sur fonction */
 			var ms_OnBlocklyUpdate = new BlockInstructionEmpty();
-			
+
 			/** @class Game
 			*/
 			function Game()
 			{
 				this.m_Game = new Phaser.Game( 800, 600, Phaser.AUTO, '' );
-				
+
 				this.m_Game.state.add( boot.getStateName(), boot );
 				this.m_Game.state.add( preloader.getStateName(), preloader );
 				this.m_Game.state.add( tree.getStateName(), tree );
 				this.m_Game.state.add( phaserdemo1.getStateName(), phaserdemo1 );
 				this.m_Game.state.add( glassmarbles.getStateName(), glassmarbles );
-				
+
 				this.m_Game.state.start( boot.getStateName() );
 			}
 
@@ -94,7 +94,7 @@
 			<block type="bug_controls_loop"></block>
 		</xml>
 
-		<script src="src/workspace.js"></script>
+		<script src="dist/workspace.js"></script>
 
 		<script type="text/javascript">
 			jQuery(document).ready( function ($)
