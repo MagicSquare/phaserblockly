@@ -1,0 +1,73 @@
+<!doctype html>
+
+<html lang="en">
+
+	<head>
+		<meta charset="UTF-8" />
+		<title>Phaser - Blockly</title>
+
+		<link href="styles/bootstrap.min.css" rel="stylesheet">
+		<link href="styles/BugSwarm.css" rel="stylesheet">
+	</head>
+
+	<body>
+		<div id="phaserGame"/>
+		<div id="workspace" style="position:fixed;left:50%;width:40%">
+			<div id="content">
+				<ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
+					<li class="active"><a href="#red" data-toggle="tab">Blocks</a></li>
+					<li><a href="#orange" data-toggle="tab">Code</a></li>
+				</ul>
+				<div id="my-tab-content" class="tab-content" style="background-color:black">
+					<div class="tab-pane active" id="red">
+						<div id="blocklyDiv" style="height: 400px; width:100%; ">
+							<div style="float:right">
+								<button id="buildandrunButton">Build and run</button>
+								<button id="buildButton">Build</button>
+								<button id="stepButton" disabled="disabled">Step</button>
+								<button id="resetButton">Reset stage</button>
+							</div>
+						</div>
+					</div>
+					<div class="tab-pane" style="height: 400px; width:100%;" id="orange">
+						<textarea id="consoleTextarea" rows="5" cols="50"></textarea>
+					</div>
+				</div>
+			</div>
+		</div>
+
+		<xml id="toolbox" style="display: none">
+			<block type="bug_move_left"></block>
+			<block type="bug_move_right"></block>
+			<block type="bug_jump"></block>
+			<block type="bug_wait"></block>
+			<block type="bug_controls_loop"></block>
+		</xml>
+
+		<script src="scripts/blockly/blockly_compressed.js"></script>
+		<script src="scripts/blockly/blocks_compressed.js"></script>
+		<script src="scripts/blockly/javascript_compressed.js"></script>
+		<script src="scripts/blockly/fr.js"></script>
+		<script src="scripts/jquery.min.js"></script>
+		<script src="scripts/bootstrap.min.js"></script>
+		<script src="scripts/acorn.js"></script>
+		<script src="scripts/interpreter.js"></script>
+		<script src="scripts/phaser.min.js"></script>
+
+		<script src="scripts/bug_blocks.js"></script>
+		<!--<script src="scripts/boot.js"></script>-->
+		<!--<script src="scripts/preloader.js"></script>-->
+		<!--<script src="scripts/tree.js"></script>-->
+		<!--<script src="scripts/phaser-demo1.js"></script>-->
+		<!--<script src="scripts/glassmarbles.js"></script>-->
+		<script src="scripts/game.js"></script>
+		<script src="scripts/workspace.js"></script>
+
+		<script type="text/javascript">
+			jQuery(document).ready( function ($)
+			{
+				$('#tabs').tab();
+			});
+		</script>
+	</body>
+</html>

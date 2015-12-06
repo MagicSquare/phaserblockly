@@ -11,4 +11,3 @@
 ### Transpile
  - npm install
  - gulp
- - files transpiled in dist folder

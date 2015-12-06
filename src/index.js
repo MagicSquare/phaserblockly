@@ -1,19 +1,24 @@
-/** Pointeur sur fonction */
-var ms_OnBlocklyUpdate = new BlockInstructionEmpty();
+import BootState from './states/BootState';
+import PreloaderState from './states/PreloaderState';
+import TreeState from './states/TreeState';
+import PhaserDemo1State from './states/PhaserDemo1State';
+import GlassMarblesState from './states/GlassMarblesState';
 
-/** @class Game
- */
-function Game()
-{
-    this.m_Game = new Phaser.Game( 800, 600, Phaser.AUTO, '' );
+class Game extends Phaser.Game {
 
-    this.m_Game.state.add( boot.getStateName(), boot );
-    this.m_Game.state.add( preloader.getStateName(), preloader );
-    this.m_Game.state.add( tree.getStateName(), tree );
-    this.m_Game.state.add( phaserdemo1.getStateName(), phaserdemo1 );
-    this.m_Game.state.add( glassmarbles.getStateName(), glassmarbles );
-
-    this.m_Game.state.start( boot.getStateName() );
+    constructor() {
+        super(800, 600, Phaser.AUTO, 'phaserGame', null);
+        this.state.add(BootState.getStateName(), BootState);
+        this.state.add(PreloaderState.getStateName(), PreloaderState);
+        this.state.add(TreeState.getStateName(), TreeState);
+        this.state.add(PhaserDemo1State.getStateName(), PhaserDemo1State);
+        this.state.add(GlassMarblesState.getStateName(), GlassMarblesState);
+        this.state.start(BootState.getStateName());
+    }
 }
 
-var ms_Phaser = new Game();
+new Game();
+
+
+/** Pointeur sur fonction */
+//var ms_OnBlocklyUpdate = new BlockInstructionEmpty();
