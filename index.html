@@ -41,6 +41,8 @@
 		
 			/** Pointeur sur fonction */
 			var ms_OnBlocklyUpdate = new BlockInstructionEmpty();
+			var ms_OnBlocklyLevelEditorCreate = new BlockInstructionEmpty();
+			var ms_OnBlocklyLevelEditorUdpate = new BlockInstructionEmpty();
 			
 			/** @class Game
 			*/
@@ -64,12 +66,14 @@
 		<div id="workspace" style="position:fixed;left:50%;width:40%">
 			<div id="content">
 				<ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
-					<li class="active"><a href="#red" data-toggle="tab">Blocks</a></li>
-					<li><a href="#orange" data-toggle="tab">Code</a></li>
+					<li class="active"><a href="#blocklyGame" data-toggle="tab">Blocks</a></li>
+					<li><a href="#blocklyGameCode" data-toggle="tab">Code</a></li>
+					<li><a href="#blocklyLevelEditor" data-toggle="tab">Level editor</a></li>
 				</ul>
-				<div id="my-tab-content" class="tab-content" style="background-color:black">
-					<div class="tab-pane active" id="red">
-						<div id="blocklyDiv" style="height: 400px; width:100%; ">
+				<div id="blockly-tab-content" class="tab-content" style="background-color:black">
+				
+					<div class="tab-pane active" id="blocklyGame">
+						<div id="blocklyGameMenu" style="height: 400px; width:100%; "> 
 							<div style="float:right">
 								<button id="buildandrunButton">Build and run</button>
 								<button id="buildButton">Build</button>
@@ -78,19 +82,37 @@
 							</div>
 						</div>
 					</div>
-					<div class="tab-pane" style="height: 400px; width:100%;" id="orange">
+					
+					<div class="tab-pane" style="height: 400px; width:100%;" id="blocklyGameCode">
 						<textarea id="consoleTextarea" rows="5" cols="50"></textarea>
+					</div>
+					
+					<div class="tab-pane" style="height: 400px; width:100%;" id="blocklyLevelEditor">
+						<div id="blocklyLevelEditorMenu" style="height: 400px; width:100%; ">
+							<div style="float:right">
+								<button id="buildlevelButton">Build level</button>
+								<button id="resetlevelButton">Reset stage</button>
+							</div>
+						</div>
+					</div>
+					
+					<div class="tab-pane" style="height: 400px; width:100%;" id="blocklyEditorLevelCode">
+						<textarea id="consoleEditorLevelTextarea" rows="5" cols="50"></textarea>
 					</div>
 				</div>
 			</div>
 		</div>
 
 
-		<xml id="toolbox" style="display: none">
+		<xml id="gametoolbox" style="display: none">
 			<block type="bug_move_left"></block>
 			<block type="bug_move_right"></block>
 			<block type="bug_jump"></block>
 			<block type="bug_wait"></block>
+			<block type="bug_controls_loop"></block>
+		</xml>
+		
+		<xml id="leveleditortoolbox" style="display: none">
 			<block type="bug_controls_loop"></block>
 		</xml>
 
@@ -117,6 +139,96 @@
 				}, 1200 );
 			});
 		});
+		
+		// Blockly calls
+		
+		// Blockly Game update
+		var aGameUpdatePointerAcces =
+		{
+			get: function(){ return ms_OnBlocklyUpdate; },
+			set: function( inInstruction ){ ms_OnBlocklyUpdate = inInstruction; }
+		}
+		
+		var ms_GameUpdateAutomate = new Automate( aGameUpdatePointerAcces,
+												  'blocklyGameMenu',
+												  'gametoolbox',
+												  'consoleTextarea',
+												  'stepButton' );
+		
+		// Blockly editor level create
+		var aEditorLevelCreatePointerAcces = 
+		{
+			get: function(){ return ms_OnBlocklyLevelEditorCreate; },
+			set: function( inInstruction ){ ms_OnBlocklyLevelEditorCreate = inInstruction; }
+		}
+		
+		var ms_EditorLevelCreateAutomate = new Automate( aEditorLevelCreatePointerAcces,
+														 'blocklyLevelEditorMenu',
+														 'leveleditortoolbox',
+														 'consoleEditorLevelTextarea',
+														 '' );
+		
+		// Blockly editor level create
+		var aEditorLevelUpdatePointerAcces =
+		{
+			get: function(){ return ms_OnBlocklyLevelEditorUdpate; },
+			set: function( inInstruction ){ ms_OnBlocklyLevelEditorUdpate = inInstruction; }
+		}
+		
+		var ms_EditorLevelUpdateAutomate = new Automate( aEditorLevelUpdatePointerAcces,
+														 'blocklyLevelEditorMenu',
+														 'leveleditortoolbox',
+														 'consoleEditorLevelTextarea',
+														 '' );
+		
+		$( "#buildandrunButton" ).click( function() 
+		{
+			ms_GameUpdateAutomate.parseCode();
+				
+			ms_GameUpdateAutomate.nextStep();
+		});
+
+		$( "#resetButton" ).click( function() 
+		{	
+			if( ms_Phaser )
+			{
+				ms_CounterStep = 0;
+				ms_OnBlocklyUpdate = null;
+				ms_Phaser.m_Game.state.start( ms_Phaser.m_Game.state.current );
+			}
+			
+		});
+
+		$( "#buildButton" ).click( function() 
+		{
+			ms_GameUpdateAutomate.parseCode();
+		});
+
+		$( "#stepButton" ).click( function() 
+		{
+			ms_GameUpdateAutomate.stepClick();
+		});
+				
+		$( "#buildlevelButton" ).click( function() 
+		{
+			ms_EditorLevelCreateAutomate.parseCode();
+			ms_EditorLevelUpdateAutomate.parseCode();
+				
+			ms_EditorLevelCreateAutomate.nextStep();
+			ms_EditorLevelUpdateAutomate.nextStep();
+		});
+
+		$( "#resetlevelButton" ).click( function() 
+		{	
+			if( ms_Phaser )
+			{
+				ms_OnBlocklyLevelEditorCreate = null;
+				ms_OnBlocklyLevelEditorUdpate = null;
+				
+				ms_Phaser.m_Game.state.start( ms_Phaser.m_Game.state.current );
+			}	
+		});
+
 		</script>
 
 	</body>

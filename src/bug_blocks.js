@@ -1,4 +1,6 @@
-/** Before to run the instructions reinit this one. */
+/** Step counter to naming the highlight tag 
+*	@remarks Before to run the instructions reinit this one. 
+*/
 var ms_CounterStep = 0;
 
 /** To show step by step mod */
@@ -43,9 +45,9 @@ function getStrBlockInstruction( inMembers, inStrFuncGo )
 	aResult += "function()";
 	aResult += "{"
 	
-	for (i = 0; i < inMembers.length; i++) 
-	{
-		aResult += "this." + inMembers[i] + ";"
+    for (i = 0; i < inMembers.length; i++) 
+    {
+        aResult += "this." + inMembers[i] + ";"
 	}
 	
 	aResult +=	  	"this.go = function( inState )";

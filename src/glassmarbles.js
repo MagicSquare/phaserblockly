@@ -96,9 +96,9 @@ glassmarbles.prototype =
 		
 		this.m_Cursors = this.game.input.keyboard.createCursorKeys();
 
+		// http://phaser.io/docs/2.4.4/Phaser.Group.html
 		this.m_Balls = this.game.add.physicsGroup( Phaser.Physics.P2JS );
 		
-			
 		this.m_ScoreText = this.game.add.text( 16, 16, 'score: 0', { fontSize: '32px', fill: '#fff' } );
 		
 		var aGoBackButton = this.game.add.button( this.game.width, this.game.height, "backtotree", this.getGoToState( tree.getStateName() ), this );
@@ -119,7 +119,7 @@ glassmarbles.prototype =
 			{
 				ms_OnBlocklyUpdate = null;
 
-				nextStep();
+				ms_GameUpdateAutomate.nextStep();
 			}
 		}
 	},			

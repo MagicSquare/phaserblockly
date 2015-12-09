@@ -104,7 +104,7 @@ phaserdemo1.prototype =
 			{
 				ms_OnBlocklyUpdate = null;
 
-				nextStep();
+				ms_GameUpdateAutomate.nextStep();
 			}
 		}
 	},			
