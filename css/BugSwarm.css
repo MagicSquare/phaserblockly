@@ -66,8 +66,9 @@
     	background: url(../assets/test1_256.png);
     	background-position: -203px -110px;
     }
-        .coxy {
-        	    	position:absolute;
+	
+	.coxy {
+		position:absolute;
 
     	background: url(../assets/test1_256.png);
     	background-position: -190px -180px;
@@ -95,21 +96,23 @@
 		height:70px;
 		background-color:white;
 	}
-    	.inventory-tree {
-    		background-image: url(../assets/test1_1024.png);
-        	background-position: -86px -814px;		
-    	}
+	
+	.inventory-tree {
+		background-image: url(../assets/test1_1024.png);
+		background-position: -86px -814px;		
+	}
     	
-    	.meter { 
-	height: 20px;  /* Can be anything */
-	position: relative;
-	background: #555;
-	-moz-border-radius: 5px;
-	-webkit-border-radius: 5px;
-	border-radius: 5px;
-	padding: 4px;
-	box-shadow: inset 0 -1px 1px rgba(255,255,255,0.3);
-}
+	.meter { 
+		height: 20px;  /* Can be anything */
+		position: relative;
+		background: #555;
+		-moz-border-radius: 5px;
+		-webkit-border-radius: 5px;
+		border-radius: 5px;
+		padding: 4px;
+		box-shadow: inset 0 -1px 1px rgba(255,255,255,0.3);
+	}
+	
 .meter > span {
   display: block;
   height: 100%;
@@ -140,7 +143,17 @@
   background-image: linear-gradient(to bottom, #f0a3a3, #f42323);
 }
 
-.blocklyLevelEditor > span {
+.blocklyLevelEditorResources > span {
+  background-color: #f0a3a3;
+  background-image: linear-gradient(to bottom, #f0a3a3, #f42323);
+}
+
+.blocklyLevelEditorCreate > span {
+  background-color: #f0a3a3;
+  background-image: linear-gradient(to bottom, #f0a3a3, #f42323);
+}
+
+.blocklyLevelEditorUpdate > span {
   background-color: #f0a3a3;
   background-image: linear-gradient(to bottom, #f0a3a3, #f42323);
 }

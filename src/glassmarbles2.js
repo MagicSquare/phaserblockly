@@ -1,12 +1,14 @@
 
-var glassmarbles = function( game )
+var glassmarbles2 = function( game )
 {
 	this.m_Player = null;
 	this.m_Cursors = null;
 	this.m_Balls = null;
+	this.m_BallsSFX = null;
 	this.m_MaxBallsLenght = 200;
 	this.m_WaitToAddBall = 1333; //milliseconds
-	this.m_BallAnimeFPS = 2; // image per second
+	this.m_BallsAnimIdleName = 'idle';
+	this.m_BallsAnimDeathName = 'death';
 	
 	this.m_BluePath = null;		
 	this.m_RedPath = null;
@@ -19,7 +21,7 @@ var glassmarbles = function( game )
 	this.m_PhysicDebug = false;
 };
   
-glassmarbles.prototype = 
+glassmarbles2.prototype = 
 {
 	preload: function()
 	{		
@@ -34,7 +36,9 @@ glassmarbles.prototype =
 
 		this.game.load.image( 'backtotree', 'assets/back_to_tree_01.png' );
 		this.game.load.spritesheet( 'dude', 'assets/dude.png', 32, 48 );
-		this.game.load.spritesheet( 'balls', 'assets/balls.png', 17, 17 );
+		this.game.load.spritesheet( 'balls-animates', 'assets/balls-animates.png', 17, 17 );
+		
+		this.game.load.audio( 'balloom-pop', 'assets/balloom-pop.mp3' );
 	},
   	create: function()
 	{
@@ -97,6 +101,10 @@ glassmarbles.prototype =
 		// delay (ms), callbacks, context
 		this.game.time.events.loop( this.m_WaitToAddBall, this.createBalls, this );
 		
+		//	Here we set-up our audio sprite
+		this.m_BallsSFX = this.game.add.audio( 'balloom-pop' );
+		this.m_BallsSFX.allowMultiple = true;
+		
 		this.m_ScoreText = this.game.add.text( 16, 16, 'score: 0', { fontSize: '32px', fill: '#fff' } );
 		
 		var aGoBackButton = this.game.add.button( this.game.width, this.game.height, "backtotree", this.getGoToState( tree.getStateName() ), this );
@@ -112,8 +120,7 @@ glassmarbles.prototype =
 
 				ms_GameUpdateAutomate.nextStep();
 			}
-		}
-		
+		}		
 	},	
 	render: function()
 	{
@@ -125,43 +132,47 @@ glassmarbles.prototype =
 	},
 	collectBall: function( inPlayer, inBall )
 	{
-		// Removes the ball from the screen
-		//try
+		try
 		{
-			//this.m_Balls.remove( inBall.sprite, true );
+			if( inBall.sprite.animations.currentAnim.name != this.m_BallsAnimDeathName )
+			{
+				inBall.sprite.animations.play( this.m_BallsAnimDeathName, null, false, true );
+				// inBall.sprite.kill();
+				this.m_BallsSFX.play();
+			}
 		}
-		//catch( e )
+		catch( e )
 		{
-			try
-			{
-				inBall.sprite.kill();
-			}
-			catch( e )
-			{
-				console.log( inBall.sprite );
-			}
+			console.log( inBall.sprite );
 		}
 
-		//  Add and update the score
+		// Add and update the score
 		this.m_Score += 10;
 		this.m_ScoreText.text = 'Score: ' + this.m_Score;
-	},	
+	},
 	createBalls: function()
 	{
 		if( this.m_Balls.total < this.m_MaxBallsLenght )
 		{
 			this.m_WaitToAddBallCounter = 0;
 			
-			var aBall = this.m_Balls.create( this.game.width * 0.5 + this.game.rnd.integerInRange(-70,-10), 10, 'balls' );
+			var aBall = this.m_Balls.create( this.game.width * 0.5 + this.game.rnd.integerInRange(-70,-10), 10, 'balls-animates' );
 				
 			aBall.body.setCircle( 9 );
 			aBall.body.fixedRotation = true;
 
-			aBall.frame = this.game.rnd.integerInRange(0,6);
+			// Here we add a new animation called 'idle'
+			// We have specified the frame 0 but you can edit the image and add  because it's using every frame in the texture atlas
+			// name, frames, frameRate, loop 
+			aBall.animations.add( this.m_BallsAnimIdleName , [0], 10, true );
+			aBall.animations.add( this.m_BallsAnimDeathName, [1,2,3,4,5], 10, false );
+			
+			//  And this starts the animation playing by using its key ("idle")
+			aBall.animations.play( this.m_BallsAnimIdleName  );
 			
 			this.m_Player.body.createBodyCallback( aBall, this.collectBall, this );
 		}			
 	}
 }
 
-glassmarbles.getStateName = function(){ return "glassmarbles"; };
+glassmarbles2.getStateName = function(){ return "glassmarbles2"; };

@@ -22,6 +22,8 @@
 		<script src="src/tree.js"></script>
 		<script src="src/phaser-demo1.js"></script>
 		<script src="src/glassmarbles.js"></script>
+		<script src="src/glassmarbles2.js"></script>
+		<script src="src/level_editor_test01.js"></script>
 		
 		<link href="css/bootstrap.min.css" rel="stylesheet">
 		<link href="css/BugSwarm.css" rel="stylesheet">
@@ -41,6 +43,7 @@
 		
 			/** Pointeur sur fonction */
 			var ms_OnBlocklyUpdate = new BlockInstructionEmpty();
+			var ms_OnBlocklyLevelEditorResources = new BlockInstructionEmpty();
 			var ms_OnBlocklyLevelEditorCreate = new BlockInstructionEmpty();
 			var ms_OnBlocklyLevelEditorUdpate = new BlockInstructionEmpty();
 			
@@ -53,8 +56,12 @@
 				this.m_Game.state.add( boot.getStateName(), boot );
 				this.m_Game.state.add( preloader.getStateName(), preloader );
 				this.m_Game.state.add( tree.getStateName(), tree );
+				
+				// Levels
 				this.m_Game.state.add( phaserdemo1.getStateName(), phaserdemo1 );
 				this.m_Game.state.add( glassmarbles.getStateName(), glassmarbles );
+				this.m_Game.state.add( glassmarbles2.getStateName(), glassmarbles2 );
+				this.m_Game.state.add( leveleditortest01.getStateName(), leveleditortest01 );
 				
 				this.m_Game.state.start( boot.getStateName() );
 			}
@@ -62,13 +69,15 @@
 			var ms_Phaser = new Game();
 
 		</script>
-
+		
 		<div id="workspace" style="position:fixed;left:50%;width:40%">
 			<div id="content">
 				<ul id="tabs" class="nav nav-tabs" data-tabs="tabs">
-					<li class="active"><a href="#blocklyGame" data-toggle="tab">Blocks</a></li>
+					<li class="active"><a href="#blocklyGame" data-toggle="tab">Game</a></li>
 					<li><a href="#blocklyGameCode" data-toggle="tab">Code</a></li>
-					<li><a href="#blocklyLevelEditor" data-toggle="tab">Level editor</a></li>
+					<li><a href="#blocklyLevelEditorResources" data-toggle="tab">Resources</a></li>
+					<li><a href="#blocklyLevelEditorCreate" data-toggle="tab">Create</a></li>
+					<li><a href="#blocklyLevelEditorUpdate" data-toggle="tab">Update</a></li>
 				</ul>
 				<div id="blockly-tab-content" class="tab-content" style="background-color:black">
 				
@@ -87,8 +96,8 @@
 						<textarea id="consoleTextarea" rows="5" cols="50"></textarea>
 					</div>
 					
-					<div class="tab-pane" style="height: 400px; width:100%;" id="blocklyLevelEditor">
-						<div id="blocklyLevelEditorMenu" style="height: 400px; width:100%; ">
+					<div class="tab-pane"  id="blocklyLevelEditorResources">
+						<div id="blocklyLevelEditorResourcesMenu" style="height: 400px; width:100%; ">
 							<div style="float:right">
 								<button id="buildlevelButton">Build level</button>
 								<button id="resetlevelButton">Reset stage</button>
@@ -96,9 +105,24 @@
 						</div>
 					</div>
 					
-					<div class="tab-pane" style="height: 400px; width:100%;" id="blocklyEditorLevelCode">
-						<textarea id="consoleEditorLevelTextarea" rows="5" cols="50"></textarea>
+					<div class="tab-pane" id="blocklyLevelEditorCreate">
+						<div id="blocklyLevelEditorCreateMenu" style="height: 400px; width:100%; ">
+							<div style="float:right">
+								<button id="buildlevelButton">Build level</button>
+								<button id="resetlevelButton">Reset stage</button>
+							</div>
+						</div>
 					</div>
+					
+					<div class="tab-pane" id="blocklyLevelEditorUpdate">
+						<div id="blocklyLevelEditorUpdateMenu" style="height: 400px; width:100%; ">
+							<div style="float:right">
+								<button id="buildlevelButton">Build level</button>
+								<button id="resetlevelButton">Reset stage</button>
+							</div>
+						</div>
+					</div>
+					
 				</div>
 			</div>
 		</div>
@@ -112,7 +136,17 @@
 			<block type="bug_controls_loop"></block>
 		</xml>
 		
-		<xml id="leveleditortoolbox" style="display: none">
+		<xml id="leveleditorresourcestoolbox" style="display: none">
+			<block type="bug_loadimage"></block>
+			<block type="bug_controls_loop"></block>
+		</xml>
+		
+		<xml id="leveleditorcreatetoolbox" style="display: none">
+			<block type="bug_addsprite"></block>
+			<block type="bug_controls_loop"></block>
+		</xml>
+		
+		<xml id="leveleditorupdatetoolbox" style="display: none">			
 			<block type="bug_controls_loop"></block>
 		</xml>
 
@@ -154,6 +188,19 @@
 												  'gametoolbox',
 												  'consoleTextarea',
 												  'stepButton' );
+
+		// Blockly editor level resources
+		var aEditorLevelResourcesPointerAcces = 
+		{
+			get: function(){ return ms_OnBlocklyLevelEditorResources; },
+			set: function( inInstruction ){ ms_OnBlocklyLevelEditorResources = inInstruction; }
+		}
+		
+		var ms_EditorLevelResourcesAutomate = new Automate( aEditorLevelResourcesPointerAcces,
+														 'blocklyLevelEditorResourcesMenu',
+														 'leveleditorresourcestoolbox',
+														 '',
+														 '' );
 		
 		// Blockly editor level create
 		var aEditorLevelCreatePointerAcces = 
@@ -163,12 +210,12 @@
 		}
 		
 		var ms_EditorLevelCreateAutomate = new Automate( aEditorLevelCreatePointerAcces,
-														 'blocklyLevelEditorMenu',
-														 'leveleditortoolbox',
-														 'consoleEditorLevelTextarea',
+														 'blocklyLevelEditorCreateMenu',
+														 'leveleditorcreatetoolbox',
+														 '',
 														 '' );
 		
-		// Blockly editor level create
+		// Blockly editor level update
 		var aEditorLevelUpdatePointerAcces =
 		{
 			get: function(){ return ms_OnBlocklyLevelEditorUdpate; },
@@ -176,9 +223,9 @@
 		}
 		
 		var ms_EditorLevelUpdateAutomate = new Automate( aEditorLevelUpdatePointerAcces,
-														 'blocklyLevelEditorMenu',
-														 'leveleditortoolbox',
-														 'consoleEditorLevelTextarea',
+														 'blocklyLevelEditorUpdateMenu',
+														 'leveleditorupdatetoolbox',
+														 '',
 														 '' );
 		
 		$( "#buildandrunButton" ).click( function() 
@@ -211,17 +258,28 @@
 				
 		$( "#buildlevelButton" ).click( function() 
 		{
-			ms_EditorLevelCreateAutomate.parseCode();
-			ms_EditorLevelUpdateAutomate.parseCode();
-				
-			ms_EditorLevelCreateAutomate.nextStep();
-			ms_EditorLevelUpdateAutomate.nextStep();
+			//ms_EditorLevelResourcesAutomate.parseCode();
+			//ms_EditorLevelResourcesAutomate.nextStep();
+			
+			//ms_EditorLevelCreateAutomate.parseCode();
+			//ms_EditorLevelCreateAutomate.nextStep();
+			
+			//ms_EditorLevelUpdateAutomate.parseCode();			
+			//ms_EditorLevelUpdateAutomate.nextStep();
+			
+			if( ms_Phaser )
+			{
+				ms_Phaser.m_Game.state.start( ms_Phaser.m_Game.state.current );
+			}
 		});
 
 		$( "#resetlevelButton" ).click( function() 
 		{	
 			if( ms_Phaser )
 			{
+				ms_CounterStep = 0;
+				
+				ms_OnBlocklyLevelEditorResources = null;
 				ms_OnBlocklyLevelEditorCreate = null;
 				ms_OnBlocklyLevelEditorUdpate = null;
 				

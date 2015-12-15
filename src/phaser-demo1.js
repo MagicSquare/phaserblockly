@@ -97,7 +97,7 @@ phaserdemo1.prototype =
 		this.game.physics.arcade.collide( this.m_Player, this.m_Platforms );
 		this.game.physics.arcade.collide( this.m_Stars, this.m_Platforms );
 		this.game.physics.arcade.overlap( this.m_Player, this.m_Stars, this.collectStar, null, this );
-
+		
 		if( ms_OnBlocklyUpdate )
 		{
 			if( !ms_OnBlocklyUpdate.go( this ) )

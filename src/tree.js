@@ -14,6 +14,8 @@ tree.prototype =
 		
 		this.addState( this.game.width * 0.5, this.game.height, phaserdemo1.getStateName(), 'Demo 1' );		
 		this.addState( this.game.width * 0.5, this.game.height - 60, glassmarbles.getStateName(), 'Glass Marbles' );		
+		this.addState( this.game.width * 0.5, this.game.height - 120, glassmarbles2.getStateName(), 'Glass Marbles2' );		
+		this.addState( this.game.width * 0.5, this.game.height - 180, leveleditortest01.getStateName(), 'Level Editor Test 01' );		
 	},	
 	addState: function( x, y, inStateName, inTitle )
 	{

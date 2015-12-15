@@ -36,7 +36,10 @@ function BlockInstructionEmpty()
 *	@param {string[]} [inMembers] - str members arrays
 *
 *   @param {string} [inStrFuncGo] string function definition: Has to return false to close
-* 				                the instruction
+* 				                  the instruction
+*
+*	@remarks got to the blockfactory @link https://blockly-demo.appspot.com/static/demos/blockfactory/index.html
+*			 to create your own block.
 */
 function getStrBlockInstruction( inMembers, inStrFuncGo )
 {
@@ -45,7 +48,7 @@ function getStrBlockInstruction( inMembers, inStrFuncGo )
 	aResult += "function()";
 	aResult += "{"
 	
-    for (i = 0; i < inMembers.length; i++) 
+    for( i = 0; i < inMembers.length; i++ ) 
     {
         aResult += "this." + inMembers[i] + ";"
 	}
@@ -55,6 +58,8 @@ function getStrBlockInstruction( inMembers, inStrFuncGo )
 	aResult += 			inStrFuncGo;
 	aResult += 		"};";
 	aResult += "}";
+	
+	//eval(aResult);
 
 	return aResult;
 }
@@ -108,9 +113,9 @@ Blockly.Blocks['bug_move_left'] =
 	}
 };
 
-Blockly.JavaScript['bug_move_left'] = function(block)
+Blockly.JavaScript['bug_move_left'] = function( inBlock )
 { 
-  	var aTextCycle = block.getFieldValue('cycle');
+  	var aTextCycle = inBlock.getFieldValue('cycle');
   
 	var aMembers = ["m_Count = " + aTextCycle]
 
@@ -153,9 +158,9 @@ Blockly.Blocks['bug_move_right'] =
 	}
 };
 
-Blockly.JavaScript['bug_move_right'] = function(block)
+Blockly.JavaScript['bug_move_right'] = function( inBlock )
 { 
-  	var aTextCycle = block.getFieldValue('cycle');
+  	var aTextCycle = inBlock.getFieldValue('cycle');
   
 	var aMembers = ["m_Count = " + aTextCycle]
 
@@ -198,9 +203,9 @@ Blockly.Blocks['bug_jump'] =
 	}
 };
 
-Blockly.JavaScript['bug_jump'] = function(block)
+Blockly.JavaScript['bug_jump'] = function( inBlock )
 {
-	var aTextCycle = block.getFieldValue('cycle');
+	var aTextCycle = inBlock.getFieldValue('cycle');
   
 	var aMembers = ["m_Count = " + aTextCycle]
 
@@ -241,9 +246,9 @@ Blockly.Blocks['bug_wait'] =
 	}
 };
 
-Blockly.JavaScript['bug_wait'] = function(block)
+Blockly.JavaScript['bug_wait'] = function( inBlock )
 {
-	var aTextCycle = block.getFieldValue('cycle');
+	var aTextCycle = inBlock.getFieldValue('cycle');
   
 	var aMembers = ["m_Count = " + aTextCycle]
 
@@ -283,13 +288,94 @@ Blockly.Blocks['bug_controls_loop'] =
 	}
 };
 
-Blockly.JavaScript['bug_controls_loop'] = function(block)
+Blockly.JavaScript['bug_controls_loop'] = function( inBlock )
 {
-	var text_count = block.getFieldValue('count');
-	var statements_name = Blockly.JavaScript.statementToCode(block, 'innerCode');
+	var text_count = inBlock.getFieldValue('count');
+	var statements_name = Blockly.JavaScript.statementToCode( inBlock, 'innerCode');
   
 	var code = 'for( var i=0; i < ' + text_count + '; i++ ) {' + statements_name + '}';
 	
 	return code;
 };
 
+/** Load image
+*	Phase equivalent example :
+*		this.game.load.image( 'sky', 'assets/sky.png' );
+*/
+Blockly.Blocks['bug_loadimage'] = 
+{
+	init: function()
+	{
+		this.appendDummyInput()
+			.appendField("Id")
+			.appendField(new Blockly.FieldTextInput("default"), "ID");
+		this.appendDummyInput()
+			.appendField("Path")
+			.appendField(new Blockly.FieldTextInput("asset/default.png"), "PATH");
+		this.setInputsInline(true);
+		this.setPreviousStatement(true, null);
+		this.setNextStatement(true, null);
+		this.setColour(20);
+		this.setTooltip('');
+		this.setHelpUrl('http://www.example.com/');
+	}
+};
+
+Blockly.JavaScript['bug_loadimage'] = function( inBlock )
+{
+	var aTextId = inBlock.getFieldValue('ID');
+	var aTextPath = inBlock.getFieldValue('PATH');
+	
+	var aMembers = ["m_Image = null"];
+
+	// Allow the player to jump if they are touching the ground.
+	var aGoFunc = "";
+	
+	aGoFunc += "this.m_Image = inState.game.load.image( '" + aTextId + "', '" + aTextPath + "' );";						
+	aGoFunc += "return false;";
+
+	return CreateBasicFunction( aMembers, aGoFunc );
+};
+
+/** Add sprite :
+*	Phase equivalent example :
+*		this.game.add.sprite( 0, 0, 'sky' );
+*/
+Blockly.Blocks['bug_addsprite'] = 
+{
+	init: function() 
+	{
+		this.appendDummyInput()
+			.appendField( "x" )
+			.appendField( new Blockly.FieldTextInput( "0" ), "X" );
+		this.appendDummyInput()
+			.appendField( "y" )
+			.appendField( new Blockly.FieldTextInput( "0" ), "Y" );
+		this.appendDummyInput()
+			.appendField( "Image id" )
+			.appendField( new Blockly.FieldTextInput( "default" ), "ID" );
+		this.setInputsInline( true );
+		this.setPreviousStatement( true, null );
+		this.setNextStatement( true, null );
+		this.setColour( 230 );
+		this.setTooltip( '' );
+		this.setHelpUrl( 'http://www.example.com/' );
+	}
+};
+
+Blockly.JavaScript['bug_addsprite'] = function( inBlock )
+{
+	var aTextx = inBlock.getFieldValue('X');
+	var aTexty = inBlock.getFieldValue('Y');
+	var aTextId = inBlock.getFieldValue('ID');
+	
+	var aMembers = ["m_Sprite = null"];
+
+	// Allow the player to jump if they are touching the ground.
+	var aGoFunc = "";
+	
+	aGoFunc += "this.m_Sprite = inState.game.add.sprite( " + aTextx + ", " + aTexty + ", '" + aTextId + "' );";						
+	aGoFunc += "return false;";
+	
+	return CreateBasicFunction( aMembers, aGoFunc );
+};

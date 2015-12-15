@@ -2,7 +2,7 @@
 Function.prototype.context = function(context) 
 {
     var action = this;
-    return function() { action.apply(context, arguments); };
+    return function() { action.apply( context, arguments ); };
 };
 
 
@@ -79,7 +79,7 @@ function Automate( inPointerAcces, inBlocklyBoardId, inBlocklyToolBoxId, inBlock
 	this.m_BlocklyConsoleId = inBlocklyConsoleId;
 	this.m_StepButtonId = inStepButtonId;
 	
-	this.m_WorkSpace = Blockly.inject( inBlocklyBoardId, { media : 'media/', toolbox : document.getElementById( inBlocklyToolBoxId ) } );
+	this.m_WorkSpace = Blockly.inject( inBlocklyBoardId, { media : 'lib/blockly/media/', toolbox : document.getElementById( inBlocklyToolBoxId ) } );
 
 	this.m_Interpreter = null;
 		
@@ -166,8 +166,7 @@ function Automate( inPointerAcces, inBlocklyBoardId, inBlocklyToolBoxId, inBlock
 				return inInterpreter.createPrimitive( inWorkspace.highlightBlock( id ) ) ;
 			};
 			inInterpreter.setProperty( inScope, 'highlightBlock', inInterpreter.createNativeFunction( aWrapper ) ) ;
-		}
-        
+		}        
     };
 
 	this.parseCode = function() 
