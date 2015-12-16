@@ -5,25 +5,43 @@ var glassmarbles2 = function( game )
 	this.m_Cursors = null;
 	this.m_Balls = null;
 	this.m_BallsSFX = null;
-	this.m_MaxBallsLenght = 1;
-	this.m_WaitToAddBall = 1333; //milliseconds
-	this.m_BallsAnimIdleName = 'idle';
-	this.m_BallsAnimDeathName = 'death';
+	this.m_MaxBallsLenght = 0;
+	this.m_WaitToAddBall = 0;
+	this.m_LoopAddBalls = null ;
+	this.m_BallsAnimIdleName = '';
+	this.m_BallsAnimDeathName = '';
 	
 	this.m_BluePath = null;		
 	this.m_RedPath = null;
 	this.m_GreenPath = null;	
-	this.m_Rocks = null;	
+	this.m_Rocks = null;
+	this.m_Ground = null;
 
 	this.m_Score = 0;
-	this.m_ScoreText = 'Score: 0';
-	this.m_OverlapText = 'Overlap: none';
+	this.m_ScoreText = null;
+	this.m_OverlapText = null;
+	
+	// Game Over
+	this.m_GameOverText = null;
+	this.m_ButtonRetry = null;
+	this.m_ButtonQuit = null;	
 	
 	this.m_PhysicDebug = false;
 };
   
 glassmarbles2.prototype = 
 {
+	/** Use this function to init the value. The Reset stage doesn't recreate
+	*	the stage.
+	*/
+	initValues: function()
+	{
+		this.m_MaxBallsLenght = 1;
+		this.m_WaitToAddBall = 1333; //milliseconds
+		this.m_BallsAnimIdleName = 'idle';
+		this.m_BallsAnimDeathName = 'death';
+		this.m_PhysicDebug = false;
+	},
 	preload: function()
 	{		
 		this.game.load.image( 'sky', 'assets/sky.png' );
@@ -46,6 +64,8 @@ glassmarbles2.prototype =
 	},
   	create: function()
 	{
+		this.initValues();
+		
 		// Start the P2 Physics Engine
 		this.game.physics.startSystem( Phaser.Physics.P2JS );
 		this.game.physics.p2.setImpactEvents( true );
@@ -53,7 +73,7 @@ glassmarbles2.prototype =
 		// Set the gravity
 		this.game.physics.p2.gravity.y = 1000;
 		
-		//  A simple background for our game			
+		// A simple background for our game			
 		this.game.add.sprite( 0, 0, 'sky' );		
 			
 		// Balls Paths
@@ -61,7 +81,15 @@ glassmarbles2.prototype =
 		this.game.add.sprite( 0, 0, 'path_red' );	
 		this.game.add.sprite( 0, 0, 'path_green' );
 		
-		this.m_Rocks = this.game.add.sprite( this.game.world.width * 0.5, this.game.world.height * 0.5, 'rocks' );	
+		this.m_Rocks = this.game.add.sprite( this.game.world.width * 0.5, this.game.world.height * 0.5, 'rocks' );
+
+		//this.game.physics.p2.setBoundsToWorld( false, false, false, false );
+		
+		// Don't forget : P2 anchor is always place on the shape center.
+
+		this.m_Ground = this.game.add.sprite( this.game.world.width * 0.5, 599, 'empty_32x32' );
+		this.m_Ground.width = 800;
+		this.m_Ground.height = 1;	
 	
 		// The player and its settings		
 		this.m_Player = this.game.add.sprite( 32, this.game.world.height - 50, 'dude' ); 	
@@ -70,20 +98,21 @@ glassmarbles2.prototype =
 		
 		aSpritesPhysics = [];
 		aSpritesPhysics.push( this.m_Rocks );
+		aSpritesPhysics.push( this.m_Ground );
 		
 		this.game.physics.p2.enable( aSpritesPhysics, this.m_PhysicDebug );
 		
 		this.m_Rocks.body.clearShapes();
 		this.m_Rocks.body.loadPolygon( 'sprite_physics', 'glassmarbles_01');
-
+		
 		for( i = 0; i < aSpritesPhysics.length; i++ )
 		{
 			aSpritesPhysics[i].body.static = true;
-		}		
-		
+		}	
+			
 		this.createPaths();
 
-		//  Our two animations, walking left and right.
+		// Our two animations, walking left and right.
 		this.m_Player.animations.add( 'left', [0, 1, 2, 3], 10, true );
 		this.m_Player.animations.add( 'right', [5, 6, 7, 8], 10, true );
 		
@@ -91,32 +120,39 @@ glassmarbles2.prototype =
 
 		// http://phaser.io/docs/2.4.4/Phaser.Group.html
 		this.m_Balls = this.game.add.physicsGroup( Phaser.Physics.P2JS );
-		
+				
 		// delay (ms), callbacks, context
-		this.game.time.events.loop( this.m_WaitToAddBall, this.createBalls, this );
+		this.m_LoopAddBalls = this.game.time.events.loop( this.m_WaitToAddBall, this.createBalls, this );
 		this.game.time.events.loop( 250, this.checkOverlaps, this );
 		
 		//	Here we set-up our audio sprite
 		this.m_BallsSFX = this.game.add.audio( 'balloom-pop' );
 		this.m_BallsSFX.allowMultiple = true;
 		
-		this.m_ScoreText = this.game.add.text( 16, 16, 'score: 0', { fontSize: '32px', fill: '#fff' } );
-		this.m_OverlapText = this.game.add.text( 16, 48, 'overlap: ', { fontSize: '32px', fill: '#fff' } );
+		this.m_ScoreText = this.game.add.text( 16, 16, 'Score: 0', { fontSize: '32px', fill: '#fff' } );
+		this.m_OverlapText = this.game.add.text( 16, 48, 'Overlap: none', { fontSize: '32px', fill: '#fff' } );
+		this.m_GameOverText = this.game.add.text( this.game.width / 2, this.game.height / 2, 'Game Over.', { fontSize: '32px', fill: '#fff' } );
+		this.m_GameOverText.anchor.setTo( 0.5, 0.5 );
+		
+		this.m_GameOverText.visible = false;
 		
 		var aGoBackButton = this.game.add.button( this.game.width, this.game.height, "backtotree", this.getGoToState( tree.getStateName() ), this );
 		aGoBackButton.anchor.setTo( 1.0, 1.0 );
 	},
 	update: function()
-	{				
-		if( ms_OnBlocklyUpdate )
+	{
+		if( this.isNotGameOver() )
 		{
-			if( !ms_OnBlocklyUpdate.go( this ) )
+			if( ms_OnBlocklyUpdate )
 			{
-				ms_OnBlocklyUpdate = null;
+				if( !ms_OnBlocklyUpdate.go( this ) )
+				{
+					ms_OnBlocklyUpdate = null;
 
-				ms_GameUpdateAutomate.nextStep();
-			}
-		}	
+					ms_GameUpdateAutomate.nextStep();
+				}
+			}	
+		}
 	},	
 	render: function()
 	{
@@ -139,19 +175,23 @@ glassmarbles2.prototype =
 	{
 		return function (){ this.game.state.start( inStateName ); };
 	},
+	isNotGameOver: function()
+	{
+		return !this.m_GameOverText.visible;
+	},
 	createPaths: function()
 	{
 		// http://phaser.io/examples/v2/groups/call-all-input
 		
-		//  Here we create our coins group
+		// Here we create our coins group
 		this.m_BluePath = this.game.add.group();     
 		this.m_GreenPath = this.game.add.group();     
 		this.m_RedPath = this.game.add.group();     
  
-		//  Now place the red square path		
+		// Now place the red square path		
 		var aRedSquare = this.m_RedPath.create( 60, 248, 'empty_32x32' );
 		
-		//  Scale it to fit the width of the game (the original sprite is 400x32 in size)
+		// Scale it to fit the width of the game (the original sprite is 400x32 in size)
 		aRedSquare.width = 131;
 		aRedSquare.height = 350;
 
@@ -182,7 +222,8 @@ glassmarbles2.prototype =
 	},
 	checkOverlaps: function()
 	{
-		this.m_Balls.forEach( this.checkOverlap, this );
+		if( this.isNotGameOver() )
+			this.m_Balls.forEach( this.checkOverlap, this );
 	},
 	checkOverlap: function( inBall )
 	{	
@@ -230,6 +271,19 @@ glassmarbles2.prototype =
 		this.m_Score += 10;
 		this.m_ScoreText.text = 'Score: ' + this.m_Score;
 	},
+	crashBall: function( inGround, inBall )
+	{		
+		this.m_GameOverText.visible = true;
+		
+		this.m_MaxBallsLenght = 200;
+		this.m_LoopAddBalls.delay = 10;
+		
+		// The paused state of the Game. A paused game doesn't update any of its
+		// subsystems.
+		// When a game is paused the onPause event is dispatched. When it is 
+		// resumed the onResume event is dispatched.
+		// this.game.pause = true;
+	},
 	createBalls: function()
 	{
 		if( this.m_Balls.total < this.m_MaxBallsLenght )
@@ -247,10 +301,15 @@ glassmarbles2.prototype =
 			aBall.animations.add( this.m_BallsAnimIdleName , [0], 10, true );
 			aBall.animations.add( this.m_BallsAnimDeathName, [1,2,3,4,5], 10, false );
 			
-			//  And this starts the animation playing by using its key ("idle")
+			// And this starts the animation playing by using its key ("idle")
 			aBall.animations.play( this.m_BallsAnimIdleName );
 			
 			this.m_Player.body.createBodyCallback( aBall, this.collectBall, this );
+			
+			if( this.isNotGameOver() )
+			{
+				this.m_Ground.body.createBodyCallback( aBall, this.crashBall, this );
+			}
 		}			
 	}
 }
