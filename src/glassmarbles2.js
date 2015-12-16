@@ -5,7 +5,7 @@ var glassmarbles2 = function( game )
 	this.m_Cursors = null;
 	this.m_Balls = null;
 	this.m_BallsSFX = null;
-	this.m_MaxBallsLenght = 200;
+	this.m_MaxBallsLenght = 1;
 	this.m_WaitToAddBall = 1333; //milliseconds
 	this.m_BallsAnimIdleName = 'idle';
 	this.m_BallsAnimDeathName = 'death';
@@ -16,7 +16,8 @@ var glassmarbles2 = function( game )
 	this.m_Rocks = null;	
 
 	this.m_Score = 0;
-	this.m_ScoreText = 'score: 0';
+	this.m_ScoreText = 'Score: 0';
+	this.m_OverlapText = 'Overlap: none';
 	
 	this.m_PhysicDebug = false;
 };
@@ -28,6 +29,7 @@ glassmarbles2.prototype =
 		this.game.load.image( 'sky', 'assets/sky.png' );
 		
 		this.game.load.image( 'rocks', 'assets/glassmarbles_01.png' );
+		
 		this.game.load.image( 'path_green', 'assets/glassmarbles_01-green.png' );
 		this.game.load.image( 'path_blue', 'assets/glassmarbles_01-blue.png' );
 		this.game.load.image( 'path_red', 'assets/glassmarbles_01-red.png' );
@@ -39,6 +41,8 @@ glassmarbles2.prototype =
 		this.game.load.spritesheet( 'balls-animates', 'assets/balls-animates.png', 17, 17 );
 		
 		this.game.load.audio( 'balloom-pop', 'assets/balloom-pop.mp3' );
+		
+		this.game.load.image( 'empty_32x32', 'assets/empty_32x32.png' );
 	},
   	create: function()
 	{
@@ -53,9 +57,9 @@ glassmarbles2.prototype =
 		this.game.add.sprite( 0, 0, 'sky' );		
 			
 		// Balls Paths
-		this.m_BluePath = this.game.add.sprite( 0, 0, 'path_blue' );	
-		this.m_RedPath = this.game.add.sprite( 0, 0, 'path_red' );	
-		this.m_GreenPath = this.game.add.sprite( 0, 0, 'path_green' );
+		this.game.add.sprite( 0, 0, 'path_blue' );	
+		this.game.add.sprite( 0, 0, 'path_red' );	
+		this.game.add.sprite( 0, 0, 'path_green' );
 		
 		this.m_Rocks = this.game.add.sprite( this.game.world.width * 0.5, this.game.world.height * 0.5, 'rocks' );	
 	
@@ -65,21 +69,9 @@ glassmarbles2.prototype =
 		this.m_Player.body.fixedRotation = true;		
 		
 		aSpritesPhysics = [];
-		//aSpritesPhysics.push( this.m_BluePath );
-		//aSpritesPhysics.push( this.m_RedPath );
-		//aSpritesPhysics.push( this.m_GreenPath );
 		aSpritesPhysics.push( this.m_Rocks );
 		
 		this.game.physics.p2.enable( aSpritesPhysics, this.m_PhysicDebug );
-		
-		//this.m_BluePath.body.clearShapes();
-		//this.m_BluePath.body.loadPolygon( 'sprite_physics', 'glassmarbles_01-blue');		
-
-		//this.m_RedPath.body.clearShapes();
-		//this.m_RedPath.body.loadPolygon( 'sprite_physics', 'glassmarbles_01-red');		
-		
-		//this.m_GreenPath.body.clearShapes();
-		//this.m_GreenPath.body.loadPolygon( 'sprite_physics', 'glassmarbles_01-green');
 		
 		this.m_Rocks.body.clearShapes();
 		this.m_Rocks.body.loadPolygon( 'sprite_physics', 'glassmarbles_01');
@@ -88,6 +80,8 @@ glassmarbles2.prototype =
 		{
 			aSpritesPhysics[i].body.static = true;
 		}		
+		
+		this.createPaths();
 
 		//  Our two animations, walking left and right.
 		this.m_Player.animations.add( 'left', [0, 1, 2, 3], 10, true );
@@ -100,12 +94,14 @@ glassmarbles2.prototype =
 		
 		// delay (ms), callbacks, context
 		this.game.time.events.loop( this.m_WaitToAddBall, this.createBalls, this );
+		this.game.time.events.loop( 250, this.checkOverlaps, this );
 		
 		//	Here we set-up our audio sprite
 		this.m_BallsSFX = this.game.add.audio( 'balloom-pop' );
 		this.m_BallsSFX.allowMultiple = true;
 		
 		this.m_ScoreText = this.game.add.text( 16, 16, 'score: 0', { fontSize: '32px', fill: '#fff' } );
+		this.m_OverlapText = this.game.add.text( 16, 48, 'overlap: ', { fontSize: '32px', fill: '#fff' } );
 		
 		var aGoBackButton = this.game.add.button( this.game.width, this.game.height, "backtotree", this.getGoToState( tree.getStateName() ), this );
 		aGoBackButton.anchor.setTo( 1.0, 1.0 );
@@ -120,15 +116,99 @@ glassmarbles2.prototype =
 
 				ms_GameUpdateAutomate.nextStep();
 			}
-		}		
+		}	
 	},	
 	render: function()
 	{
 		//this.game.debug.text( "Group size: " + this.m_Balls.total, 32, 32 );
+		/*
+		var aDebugPaths = function( inPaths, inGame )
+		{
+			if( inPaths )
+			{
+				inPaths.forEach( inGame.debug.spriteBounds, inGame.debug );
+			}
+		};
+		
+		aDebugPaths( this.m_BluePath, this.game );
+		aDebugPaths( this.m_GreenPath, this.game );
+		aDebugPaths( this.m_RedPath, this.game );
+		*/
 	},	
 	getGoToState: function( inStateName )
 	{
 		return function (){ this.game.state.start( inStateName ); };
+	},
+	createPaths: function()
+	{
+		// http://phaser.io/examples/v2/groups/call-all-input
+		
+		//  Here we create our coins group
+		this.m_BluePath = this.game.add.group();     
+		this.m_GreenPath = this.game.add.group();     
+		this.m_RedPath = this.game.add.group();     
+ 
+		//  Now place the red square path		
+		var aRedSquare = this.m_RedPath.create( 60, 248, 'empty_32x32' );
+		
+		//  Scale it to fit the width of the game (the original sprite is 400x32 in size)
+		aRedSquare.width = 131;
+		aRedSquare.height = 350;
+
+		aRedSquare = this.m_RedPath.create( 276, 77, 'empty_32x32' );
+		aRedSquare.width = 132;
+		aRedSquare.height = 291;		
+		aRedSquare.angle = 62;
+
+		var aGreenSquare = this.m_GreenPath.create( 320, 355, 'empty_32x32' );	
+		aGreenSquare.width = 77;
+		aGreenSquare.height = 242;	
+
+		aGreenSquare = this.m_GreenPath.create( 213, 287, 'empty_32x32' );	
+		aGreenSquare.width = 278;
+		aGreenSquare.height = 242;			
+		
+		var aBlueSquare = this.m_BluePath.create( 671, 355, 'empty_32x32' );	
+		aBlueSquare.width = 77;
+		aBlueSquare.height = 242;	
+
+		aBlueSquare = this.m_BluePath.create( 494, 154, 'empty_32x32' );	
+		aBlueSquare.width = 276;
+		aBlueSquare.height = 377;
+		
+		aBlueSquare = this.m_BluePath.create( 394, 66, 'empty_32x32' );	
+		aBlueSquare.width = 252;
+		aBlueSquare.height = 189;		
+	},
+	checkOverlaps: function()
+	{
+		this.m_Balls.forEach( this.checkOverlap, this );
+	},
+	checkOverlap: function( inBall )
+	{	
+		var aPrefix = 'Overlap: ';
+		this.m_OverlapText.text =  aPrefix + 'none';	
+		
+		this.checkOverlapForEachPath( aPrefix + 'blue', this.m_BluePath, inBall, this.m_OverlapText );
+		this.checkOverlapForEachPath( aPrefix + 'green', this.m_GreenPath, inBall, this.m_OverlapText );
+		this.checkOverlapForEachPath( aPrefix + 'red', this.m_RedPath, inBall, this.m_OverlapText );		
+	},
+	checkOverlapForEachPath: function( inText, inGroup, inBall, inOverLapText )
+	{
+		// http://www.html5gamedevs.com/topic/4760-best-way-to-recreate-old-physicsoverlap-using-p2/
+		// http://www.html5gamedevs.com/topic/4839-p2-physics-overlap/	
+		
+		var aBoundsBall = inBall.getBounds();
+		
+		inGroup.forEach( function( inPath )
+		{
+			aBounds = inPath.getBounds();
+			
+			if( Phaser.Rectangle.intersects( aBoundsBall, aBounds ) )
+			{
+				inOverLapText.text =  inText;			
+			}	
+		});		
 	},
 	collectBall: function( inPlayer, inBall )
 	{
@@ -137,7 +217,7 @@ glassmarbles2.prototype =
 			if( inBall.sprite.animations.currentAnim.name != this.m_BallsAnimDeathName )
 			{
 				inBall.sprite.animations.play( this.m_BallsAnimDeathName, null, false, true );
-				// inBall.sprite.kill();
+
 				this.m_BallsSFX.play();
 			}
 		}
@@ -168,7 +248,7 @@ glassmarbles2.prototype =
 			aBall.animations.add( this.m_BallsAnimDeathName, [1,2,3,4,5], 10, false );
 			
 			//  And this starts the animation playing by using its key ("idle")
-			aBall.animations.play( this.m_BallsAnimIdleName  );
+			aBall.animations.play( this.m_BallsAnimIdleName );
 			
 			this.m_Player.body.createBodyCallback( aBall, this.collectBall, this );
 		}			
