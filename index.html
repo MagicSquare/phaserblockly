@@ -64,6 +64,12 @@
 				this.m_Game.state.add( leveleditortest01.getStateName(), leveleditortest01 );
 				
 				this.m_Game.state.start( boot.getStateName() );
+				
+				/** Return a reference to the current stage */
+				this.getCurrentStage = function()
+				{
+					return ms_Phaser.m_Game.state.states[ms_Phaser.m_Game.state.current];
+				};
 			}
 
 			var ms_Phaser = new Game();
@@ -133,7 +139,12 @@
 			<block type="bug_move_right"></block>
 			<block type="bug_jump"></block>
 			<block type="bug_wait"></block>
+			<block type="bug_if_glassmarble_is_colorname"></block>
+			<block type="bug_move_to_blue"></block>
+			<block type="bug_move_to_green"></block>
+			<block type="bug_move_to_red"></block>
 			<block type="bug_controls_loop"></block>
+			<block type="bug_infinite_loop"></block>
 		</xml>
 		
 		<xml id="leveleditorresourcestoolbox" style="display: none">

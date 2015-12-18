@@ -117,25 +117,25 @@ Blockly.JavaScript['bug_move_left'] = function( inBlock )
 { 
   	var aTextCycle = inBlock.getFieldValue('cycle');
   
-	var aMembers = ["m_Count = " + aTextCycle]
+	var aMembers = ["m_Count = " + aTextCycle];
 
-	var aGoFunc = ""
+	var aGoFunc = "";
 	
-	aGoFunc += "inState.m_Player.body.velocity.x = 0;" //  Reset the players velocity (movement)
+	aGoFunc += "inState.m_Player.body.velocity.x = 0;"; //  Reset the players velocity (movement)
 		
-	aGoFunc += "if( 0 < this.m_Count )"
-	aGoFunc += "{"		
-	aGoFunc += 		"inState.m_Player.body.velocity.x = -150;" //  Move to the right
-	aGoFunc += 		"inState.m_Player.animations.play('left');"
-	aGoFunc +=      "this.m_Count--;"					
-	aGoFunc +=		"return true;"
-	aGoFunc += "}"
-	aGoFunc += "else"
-	aGoFunc += "{"		
-	aGoFunc += 		"inState.m_Player.animations.stop();" //  Stand still
-	aGoFunc += 		"inState.m_Player.frame = 4;"
-	aGoFunc += 		"return false;"
-	aGoFunc += "}"
+	aGoFunc += "if( 0 < this.m_Count )";
+	aGoFunc += "{";		
+	aGoFunc += 		"inState.m_Player.body.velocity.x = -150;"; //  Move to the right
+	aGoFunc += 		"inState.m_Player.animations.play('left');";
+	aGoFunc +=      "this.m_Count--;";					
+	aGoFunc +=		"return true;";
+	aGoFunc += "}";
+	aGoFunc += "else";
+	aGoFunc += "{";		
+	aGoFunc += 		"inState.m_Player.animations.stop();"; //  Stand still
+	aGoFunc += 		"inState.m_Player.frame = 4;";
+	aGoFunc += 		"return false;";
+	aGoFunc += "}";
 
 	return CreateBasicFunction( aMembers, aGoFunc );
 };
@@ -162,25 +162,25 @@ Blockly.JavaScript['bug_move_right'] = function( inBlock )
 { 
   	var aTextCycle = inBlock.getFieldValue('cycle');
   
-	var aMembers = ["m_Count = " + aTextCycle]
+	var aMembers = ["m_Count = " + aTextCycle];
 
-	var aGoFunc = ""
+	var aGoFunc = "";
 		
-	aGoFunc += "inState.m_Player.body.velocity.x = 0;" //  Reset the players velocity (movement)
+	aGoFunc += "inState.m_Player.body.velocity.x = 0;"; //  Reset the players velocity (movement)
 			
-	aGoFunc += "if( 0 < this.m_Count )"
-	aGoFunc += "{"		
-	aGoFunc += 		"inState.m_Player.body.velocity.x = 150;" //  Move to the right
-	aGoFunc += 		"inState.m_Player.animations.play('right');"
-	aGoFunc +=      "this.m_Count--;"					
-	aGoFunc +=		"return true;"
-	aGoFunc += "}"
-	aGoFunc += "else"
-	aGoFunc += "{"		
-	aGoFunc += 		"inState.m_Player.animations.stop();" //  Stand still
-	aGoFunc += 		"inState.m_Player.frame = 4;"
-	aGoFunc += 		"return false;"
-	aGoFunc += "}"
+	aGoFunc += "if( 0 < this.m_Count )";
+	aGoFunc += "{";		
+	aGoFunc += 		"inState.m_Player.body.velocity.x = 150;"; //  Move to the right
+	aGoFunc += 		"inState.m_Player.animations.play('right');";
+	aGoFunc +=      "this.m_Count--;";					
+	aGoFunc +=		"return true;";
+	aGoFunc += "}";
+	aGoFunc += "else";
+	aGoFunc += "{";		
+	aGoFunc += 		"inState.m_Player.animations.stop();"; //  Stand still
+	aGoFunc += 		"inState.m_Player.frame = 4;";
+	aGoFunc += 		"return false;";
+	aGoFunc += "}";
 
 	return CreateBasicFunction( aMembers, aGoFunc );
 };
@@ -207,23 +207,23 @@ Blockly.JavaScript['bug_jump'] = function( inBlock )
 {
 	var aTextCycle = inBlock.getFieldValue('cycle');
   
-	var aMembers = ["m_Count = " + aTextCycle]
+	var aMembers = ["m_Count = " + aTextCycle];
 
 	// Allow the player to jump if they are touching the ground.
-	var aGoFunc = ""
+	var aGoFunc = "";
 	
-	aGoFunc += "if( 0 < this.m_Count )"
-	aGoFunc += "{"
-	aGoFunc +=		"inState.m_Player.body.velocity.y = -350;"
-	aGoFunc +=      "this.m_Count--;"					
-	aGoFunc +=		"return true;"
-	aGoFunc += "}"
-	aGoFunc += "else"
-	aGoFunc += "{"					
-	aGoFunc +=		"inState.m_Player.animations.stop();" //  Stand still
-	aGoFunc +=		"inState.m_Player.frame = 4;"				
-	aGoFunc +=		"return false;"
-	aGoFunc += "}"
+	aGoFunc += "if( 0 < this.m_Count )";
+	aGoFunc += "{";
+	aGoFunc +=		"inState.m_Player.body.velocity.y = -350;";
+	aGoFunc +=      "this.m_Count--;";					
+	aGoFunc +=		"return true;";
+	aGoFunc += "}";
+	aGoFunc += "else";
+	aGoFunc += "{";					
+	aGoFunc +=		"inState.m_Player.animations.stop();"; //  Stand still
+	aGoFunc +=		"inState.m_Player.frame = 4;";				
+	aGoFunc +=		"return false;";
+	aGoFunc += "}";
 
 	return CreateBasicFunction( aMembers, aGoFunc );
 };
@@ -250,22 +250,22 @@ Blockly.JavaScript['bug_wait'] = function( inBlock )
 {
 	var aTextCycle = inBlock.getFieldValue('cycle');
   
-	var aMembers = ["m_Count = " + aTextCycle]
+	var aMembers = ["m_Count = " + aTextCycle];
 
 	// Allow the player to jump if they are touching the ground.
-	var aGoFunc = ""
+	var aGoFunc = "";
 	
-	aGoFunc += "if( 0 < this.m_Count )"
-	aGoFunc += "{"
-	aGoFunc +=		"inState.m_Player.animations.stop();" //  Stand still
-	aGoFunc +=		"inState.m_Player.frame = 4;"		
-	aGoFunc +=      "this.m_Count--;"					
-	aGoFunc +=		"return true;"
-	aGoFunc += "}"
-	aGoFunc += "else"
-	aGoFunc += "{"							
-	aGoFunc +=		"return false;"
-	aGoFunc += "}"
+	aGoFunc += "if( 0 < this.m_Count )";
+	aGoFunc += "{";
+	aGoFunc +=		"inState.m_Player.animations.stop();"; //  Stand still
+	aGoFunc +=		"inState.m_Player.frame = 4;";		
+	aGoFunc +=      "this.m_Count--;";					
+	aGoFunc +=		"return true;";
+	aGoFunc += "}";
+	aGoFunc += "else";
+	aGoFunc += "{";							
+	aGoFunc +=		"return false;";
+	aGoFunc += "}";
 
 	return CreateBasicFunction( aMembers, aGoFunc );
 };
@@ -290,12 +290,37 @@ Blockly.Blocks['bug_controls_loop'] =
 
 Blockly.JavaScript['bug_controls_loop'] = function( inBlock )
 {
-	var text_count = inBlock.getFieldValue('count');
-	var statements_name = Blockly.JavaScript.statementToCode( inBlock, 'innerCode');
+	var aTextCount = inBlock.getFieldValue( 'count' );
+	var aStatementsName = Blockly.JavaScript.statementToCode( inBlock, 'innerCode' );
   
-	var code = 'for( var i=0; i < ' + text_count + '; i++ ) {' + statements_name + '}';
+	var aCode = 'for( var i=0; i < ' + aTextCount + '; i++ ) {' + aStatementsName + '}';
 	
-	return code;
+	return aCode;
+};
+
+/** Infinite loop @see index.html toolbox */
+Blockly.Blocks['bug_infinite_loop'] =
+{
+	init: function() 
+	{
+			this.appendDummyInput()
+				.appendField("Infinite loop")
+			this.appendStatementInput("innerCode");
+			this.setPreviousStatement(true);
+			this.setNextStatement(true);
+			this.setColour(135);
+		this.setTooltip('');
+		this.setHelpUrl('http://www.example.com/');
+	}
+};
+
+Blockly.JavaScript['bug_infinite_loop'] = function( inBlock )
+{
+	var aStatementsName = Blockly.JavaScript.statementToCode( inBlock, 'innerCode' );
+  
+	var aCode = 'while( true ) {' + aStatementsName + '}';
+	
+	return aCode;
 };
 
 /** Load image
@@ -378,4 +403,175 @@ Blockly.JavaScript['bug_addsprite'] = function( inBlock )
 	aGoFunc += "return false;";
 	
 	return CreateBasicFunction( aMembers, aGoFunc );
+};
+
+//************************//
+// Glass Marble level 2   //
+//************************//
+
+function GotoColor( inColorVarName )
+{
+	var aGetAnimFunc = "";
+	aGetAnimFunc +=	"getAnim = function( inSign )";
+	aGetAnimFunc +=	"{";
+	aGetAnimFunc +=		"var aResult = 'right';";
+	aGetAnimFunc +=		"if( inSign < 0 )";
+	aGetAnimFunc +=		"{";
+	aGetAnimFunc +=			"aResult = 'left';";
+	aGetAnimFunc +=		"}";
+	aGetAnimFunc +=		"return aResult;";
+	aGetAnimFunc +=	"}";
+	
+	var aMembers = ["m_IsComingBack = false", "m_Count = 50", aGetAnimFunc];
+	
+	var aGoFunc = "";
+	//  Reset the players velocity (movement)
+	aGoFunc += "inState.m_Player.body.velocity.x = 0;"; 
+		
+	aGoFunc += "if( !this.m_IsComingBack && !inState.isCloseToPalyer( inState." + inColorVarName + " ) )";
+	aGoFunc += "{";		
+	aGoFunc += 		"var aDirectionX = inState." + inColorVarName + " - inState.m_Player.body.x;";
+	aGoFunc += 		"var aSign = Phaser.Math.sign( aDirectionX );";		
+	aGoFunc += 		"inState.m_Player.body.velocity.x = aSign * inState.m_PlayerVelocityX;"
+	aGoFunc += 		"inState.m_Player.animations.play( this.getAnim( aSign ) ) ;";							
+	aGoFunc +=		"return true;";
+	aGoFunc += "}";
+	aGoFunc += "else";
+	aGoFunc += "{";	
+	aGoFunc += 		"if( !this.m_IsComingBack )";
+	aGoFunc += 		"{"				
+	aGoFunc += 			"this.m_IsComingBack = true;";				
+	aGoFunc += 		"}";
+			
+	aGoFunc += 		"if( 0 < this.m_Count )"; // we wait before to coming back 
+	aGoFunc += 		"{";
+	aGoFunc +=			"inState.m_Player.animations.play( 'idle' );";		
+	aGoFunc +=      	"this.m_Count--;";					
+	aGoFunc +=			"return true;";
+	aGoFunc += 		"}";
+	aGoFunc += 		"else";
+	aGoFunc += 		"{";	
+	aGoFunc += 			"if( !inState.isCloseToPalyer( inState.m_Origin ) )";
+	aGoFunc += 			"{";
+	aGoFunc += 				"var aDirectionX = inState.m_Origin - inState.m_Player.body.x;";	
+	aGoFunc += 				"var aSign = Phaser.Math.sign( aDirectionX );";		
+	aGoFunc += 				"inState.m_Player.body.velocity.x = aSign * inState.m_PlayerVelocityX;"
+	aGoFunc += 				"inState.m_Player.animations.play( this.getAnim( aSign ) );";			
+	aGoFunc +=				"return true;";
+	aGoFunc += 			"}";	
+	aGoFunc += 			"else";	
+	aGoFunc += 			"{";	
+	aGoFunc += 				"inState.m_Player.animations.play( 'idle' );";
+	aGoFunc += 				"return false;";
+	aGoFunc += 			"}";
+	aGoFunc +=		"}";	
+	aGoFunc += "}";
+
+	return CreateBasicFunction( aMembers, aGoFunc );
+}
+
+
+/** Move to blue @see index.html toolbox */
+Blockly.Blocks['bug_move_to_blue'] = 
+{
+	init: function() 
+	{
+		this.appendDummyInput()
+			.appendField( "Move to blue pipe" );
+		this.setPreviousStatement( true, null );
+		this.setNextStatement( true, null );
+		this.setColour( 230 );
+		this.setTooltip( '' );
+		this.setHelpUrl( 'http://www.example.com/' );
+	}
+};
+
+Blockly.JavaScript['bug_move_to_blue'] = function( inBlock )
+{  
+	return GotoColor( "m_BluePos" );
+};
+
+/** Move to green @see index.html toolbox */
+Blockly.Blocks['bug_move_to_green'] = 
+{
+	init: function() 
+	{
+		this.appendDummyInput()
+			.appendField( "Move to green pipe" );
+		this.setPreviousStatement( true, null );
+		this.setNextStatement( true, null );
+		this.setColour( 230 );
+		this.setTooltip( '' );
+		this.setHelpUrl( 'http://www.example.com/' );
+	}
+};
+
+Blockly.JavaScript['bug_move_to_green'] = function( inBlock )
+{  
+	return GotoColor( "m_GreenPos" );
+};
+
+/** Move to red @see index.html toolbox */
+Blockly.Blocks['bug_move_to_red'] = 
+{
+	init: function() 
+	{
+		this.appendDummyInput()
+			.appendField( "Move to red pipe" );
+		this.setPreviousStatement( true, null );
+		this.setNextStatement( true, null );
+		this.setColour( 230 );
+		this.setTooltip( '' );
+		this.setHelpUrl( 'http://www.example.com/' );
+	}
+};
+
+Blockly.JavaScript['bug_move_to_red'] = function( inBlock )
+{  
+	return GotoColor( "m_RedPos" );
+};
+
+/** If the glass marble is COLORNAME */
+Blockly.Blocks['bug_if_glassmarble_is_colorname'] =
+{
+	init: function() 
+	{
+		this.appendDummyInput()
+			.appendField("If the glass marble is")
+			.appendField(new Blockly.FieldDropdown([["blue", "blue"], ["green", "green"], ["red", "red"]]), "colorname")
+			.appendField(".");
+		this.appendStatementInput( "innerCode" );
+		this.setPreviousStatement( true, null );
+		this.setNextStatement( true, null );
+		this.setColour(230);
+		this.setTooltip('');
+		this.setHelpUrl('http://www.example.com/');
+	}
+};
+
+Blockly.JavaScript['bug_if_glassmarble_is_colorname'] = function( inBlock )
+{
+	var aDropdownColorName = inBlock.getFieldValue('colorname');
+	
+	var aColorVarName = '';
+	
+	if( aDropdownColorName == "red" )
+		aColorVarName = 'm_RedOverLap';
+	
+	if( aDropdownColorName == "blue" )
+		aColorVarName = 'm_BlueOverLap';
+	
+	if( aDropdownColorName == "green" )
+		aColorVarName = 'm_GreenOverLap';	
+	
+	//var aStrCondition = 'eval( "ms_Phaser.getCurrentStage().'+ aColorVarName + '" )' ;  
+	var aStrCondition = 'eval( "glassmarbles2.'+ aColorVarName + '" )' ;  
+	
+	//alert( eval( aStrCondition ) );
+  
+	var aStatementsName = Blockly.JavaScript.statementToCode( inBlock, 'innerCode' );
+	
+	var aCode = 'if( ' + aStrCondition + ' ) {' + aStatementsName + '}';
+	
+	return aCode;
 };

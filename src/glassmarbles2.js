@@ -8,8 +8,8 @@ var glassmarbles2 = function( game )
 	this.m_MaxBallsLenght = 0;
 	this.m_WaitToAddBall = 0;
 	this.m_LoopAddBalls = null ;
-	this.m_BallsAnimIdleName = '';
-	this.m_BallsAnimDeathName = '';
+	this.m_BallsAnimIdleName = 'idle';
+	this.m_BallsAnimDeathName = 'death';
 	
 	this.m_BluePath = null;		
 	this.m_RedPath = null;
@@ -27,35 +27,50 @@ var glassmarbles2 = function( game )
 	this.m_ButtonQuit = null;	
 	
 	this.m_PhysicDebug = false;
+	
+	// Player Positions
+	this.m_RedPos = 120;
+	this.m_GreenPos = 350;
+	this.m_BluePos = 700;
+	this.m_Origin = 400;
+	this.m_PlayerVelocityX = 250;
+	
+	this.m_RedOverLap = false; /**< If true a ball it's on the red path */
+	this.m_GreenOverLap = false; /**< If true a ball it's on the green path */
+	this.m_BlueOverLap = false; /**< If true a ball it's on the blue path */
 };
   
 glassmarbles2.prototype = 
 {
-	/** Use this function to init the value. The Reset stage doesn't recreate
-	*	the stage.
+	/** Use this function to init the values. The Reset stage doesn't recreate
+	*	the stage object.
 	*/
 	initValues: function()
 	{
 		this.m_MaxBallsLenght = 1;
 		this.m_WaitToAddBall = 1333; //milliseconds
-		this.m_BallsAnimIdleName = 'idle';
-		this.m_BallsAnimDeathName = 'death';
-		this.m_PhysicDebug = false;
+		
+		this.m_RedOverLap = false;
+		this.m_GreenOverLap = false;
+		this.m_BlueOverLap = false;
 	},
 	preload: function()
 	{		
-		this.game.load.image( 'sky', 'assets/sky.png' );
+		this.game.load.image( 'sky', 'assets/07_glassmarbles_01_fond.png' );
+		this.game.load.image( 'firstplan', 'assets/01_glassmarbles_01_firstplan.png' );
 		
 		this.game.load.image( 'rocks', 'assets/glassmarbles_01.png' );
 		
+		/*
 		this.game.load.image( 'path_green', 'assets/glassmarbles_01-green.png' );
 		this.game.load.image( 'path_blue', 'assets/glassmarbles_01-blue.png' );
-		this.game.load.image( 'path_red', 'assets/glassmarbles_01-red.png' );
+		this.game.load.image( 'path_red', 'assets/glassmarbles_01-red.png' ); 
+		*/
 		
 		this.game.load.physics( "sprite_physics", "assets/glassmarbles_01.json" );
 
 		this.game.load.image( 'backtotree', 'assets/back_to_tree_01.png' );
-		this.game.load.spritesheet( 'dude', 'assets/dude.png', 32, 48 );
+		this.game.load.spritesheet( 'avatar', 'assets/02_glassmarbles_01_avatar.png', 76, 42 );
 		this.game.load.spritesheet( 'balls-animates', 'assets/balls-animates.png', 17, 17 );
 		
 		this.game.load.audio( 'balloom-pop', 'assets/balloom-pop.mp3' );
@@ -74,7 +89,7 @@ glassmarbles2.prototype =
 		this.game.physics.p2.gravity.y = 1000;
 		
 		// A simple background for our game			
-		this.game.add.sprite( 0, 0, 'sky' );		
+		this.game.add.sprite( 0, 0, 'sky' );			
 			
 		// Balls Paths
 		this.game.add.sprite( 0, 0, 'path_blue' );	
@@ -87,14 +102,14 @@ glassmarbles2.prototype =
 		
 		// Don't forget : P2 anchor is always place on the shape center.
 
-		this.m_Ground = this.game.add.sprite( this.game.world.width * 0.5, 599, 'empty_32x32' );
+		this.m_Ground = this.game.add.sprite( this.game.world.width * 0.5, 639, 'empty_32x32' );
 		this.m_Ground.width = 800;
-		this.m_Ground.height = 1;	
+		this.m_Ground.height = 100;	
 	
 		// The player and its settings		
-		this.m_Player = this.game.add.sprite( 32, this.game.world.height - 50, 'dude' ); 	
+		this.m_Player = this.game.add.sprite( this.m_Origin, this.game.world.height - 50, 'avatar' ); 	
 		this.game.physics.p2.enable( [this.m_Player], this.m_PhysicDebug );	
-		this.m_Player.body.fixedRotation = true;		
+		this.m_Player.body.fixedRotation = true;	
 		
 		aSpritesPhysics = [];
 		aSpritesPhysics.push( this.m_Rocks );
@@ -113,8 +128,9 @@ glassmarbles2.prototype =
 		this.createPaths();
 
 		// Our two animations, walking left and right.
-		this.m_Player.animations.add( 'left', [0, 1, 2, 3], 10, true );
-		this.m_Player.animations.add( 'right', [5, 6, 7, 8], 10, true );
+		this.m_Player.animations.add( 'left', [0], 10, true );
+		this.m_Player.animations.add( 'right', [1], 10, true );
+		this.m_Player.animations.add( 'idle', [1], 10, true );
 		
 		this.m_Cursors = this.game.input.keyboard.createCursorKeys();
 
@@ -138,6 +154,8 @@ glassmarbles2.prototype =
 		
 		var aGoBackButton = this.game.add.button( this.game.width, this.game.height, "backtotree", this.getGoToState( tree.getStateName() ), this );
 		aGoBackButton.anchor.setTo( 1.0, 1.0 );
+		
+		this.game.add.sprite( 0, 0, 'firstplan' );
 	},
 	update: function()
 	{
@@ -273,11 +291,12 @@ glassmarbles2.prototype =
 	},
 	crashBall: function( inGround, inBall )
 	{		
+		/*
 		this.m_GameOverText.visible = true;
 		
-		this.m_MaxBallsLenght = 200;
-		this.m_LoopAddBalls.delay = 10;
-		
+		this.m_MaxBallsLenght = 0;
+		this.m_LoopAddBalls.delay = 500000;
+		*/
 		// The paused state of the Game. A paused game doesn't update any of its
 		// subsystems.
 		// When a game is paused the onPause event is dispatched. When it is 
@@ -290,7 +309,7 @@ glassmarbles2.prototype =
 		{
 			this.m_WaitToAddBallCounter = 0;
 			
-			var aBall = this.m_Balls.create( this.game.width * 0.5 + this.game.rnd.integerInRange(-70,-10), 10, 'balls-animates' );
+			var aBall = this.m_Balls.create( this.game.rnd.integerInRange( 335, 430 ), 10, 'balls-animates' );
 				
 			aBall.body.setCircle( 9 );
 			aBall.body.fixedRotation = true;
@@ -311,6 +330,12 @@ glassmarbles2.prototype =
 				this.m_Ground.body.createBodyCallback( aBall, this.crashBall, this );
 			}
 		}			
+	},
+	isCloseToPalyer: function( inPositionX )
+	{
+		var aEpsilon = 4;
+		
+		return Math.abs( this.m_Player.body.x - inPositionX ) < aEpsilon; 
 	}
 }
 
