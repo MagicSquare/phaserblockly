@@ -65,10 +65,17 @@
 				
 				this.m_Game.state.start( boot.getStateName() );
 				
+				this.m_CurrentStage = null;
+				
 				/** Return a reference to the current stage */
 				this.getCurrentStage = function()
 				{
-					return ms_Phaser.m_Game.state.states[ms_Phaser.m_Game.state.current];
+					aResult = this.m_CurrentStage;
+					
+					if( !aResult )
+						alert( "Game.m_CurrentStage is null." );
+						
+					return aResult;
 				};
 			}
 

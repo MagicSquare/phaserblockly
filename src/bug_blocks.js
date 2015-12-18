@@ -294,7 +294,7 @@ Blockly.JavaScript['bug_controls_loop'] = function( inBlock )
 	var aStatementsName = Blockly.JavaScript.statementToCode( inBlock, 'innerCode' );
   
 	var aCode = 'for( var i=0; i < ' + aTextCount + '; i++ ) {' + aStatementsName + '}';
-	
+	aCode += getEndBlockCode();
 	return aCode;
 };
 
@@ -319,7 +319,7 @@ Blockly.JavaScript['bug_infinite_loop'] = function( inBlock )
 	var aStatementsName = Blockly.JavaScript.statementToCode( inBlock, 'innerCode' );
   
 	var aCode = 'while( true ) {' + aStatementsName + '}';
-	
+	aCode += getEndBlockCode();
 	return aCode;
 };
 
@@ -564,14 +564,14 @@ Blockly.JavaScript['bug_if_glassmarble_is_colorname'] = function( inBlock )
 	if( aDropdownColorName == "green" )
 		aColorVarName = 'm_GreenOverLap';	
 	
-	//var aStrCondition = 'eval( "ms_Phaser.getCurrentStage().'+ aColorVarName + '" )' ;  
-	var aStrCondition = 'eval( "glassmarbles2.'+ aColorVarName + '" )' ;  
+	var aStrCondition = 'eval( "ms_Phaser.getCurrentStage().'+ aColorVarName + '" )' ;  
+	//var aStrCondition = 'eval( "glassmarbles2.'+ aColorVarName + '" )' ;  
 	
 	//alert( eval( aStrCondition ) );
-  
+	  
 	var aStatementsName = Blockly.JavaScript.statementToCode( inBlock, 'innerCode' );
 	
 	var aCode = 'if( ' + aStrCondition + ' ) {' + aStatementsName + '}';
-	
+	aCode += getEndBlockCode();
 	return aCode;
 };

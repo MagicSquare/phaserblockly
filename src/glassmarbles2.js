@@ -27,13 +27,14 @@ var glassmarbles2 = function( game )
 	this.m_ButtonQuit = null;	
 	
 	this.m_PhysicDebug = false;
+	this.m_Gravity = 600.0;
 	
 	// Player Positions
 	this.m_RedPos = 120;
 	this.m_GreenPos = 350;
 	this.m_BluePos = 700;
 	this.m_Origin = 400;
-	this.m_PlayerVelocityX = 250;
+	this.m_PlayerVelocityX = 500;
 	
 	this.m_RedOverLap = false; /**< If true a ball it's on the red path */
 	this.m_GreenOverLap = false; /**< If true a ball it's on the green path */
@@ -53,6 +54,8 @@ glassmarbles2.prototype =
 		this.m_RedOverLap = false;
 		this.m_GreenOverLap = false;
 		this.m_BlueOverLap = false;
+		
+		ms_Phaser.m_CurrentStage = this;
 	},
 	preload: function()
 	{		
@@ -71,7 +74,7 @@ glassmarbles2.prototype =
 
 		this.game.load.image( 'backtotree', 'assets/back_to_tree_01.png' );
 		this.game.load.spritesheet( 'avatar', 'assets/02_glassmarbles_01_avatar.png', 76, 42 );
-		this.game.load.spritesheet( 'balls-animates', 'assets/balls-animates.png', 17, 17 );
+		this.game.load.spritesheet( 'balls-animates', 'assets/glassmarbles_01final_animation_disparition.png', 64, 64 );
 		
 		this.game.load.audio( 'balloom-pop', 'assets/balloom-pop.mp3' );
 		
@@ -86,7 +89,7 @@ glassmarbles2.prototype =
 		this.game.physics.p2.setImpactEvents( true );
 		
 		// Set the gravity
-		this.game.physics.p2.gravity.y = 1000;
+		this.game.physics.p2.gravity.y = this.m_Gravity;
 		
 		// A simple background for our game			
 		this.game.add.sprite( 0, 0, 'sky' );			
@@ -248,9 +251,9 @@ glassmarbles2.prototype =
 		var aPrefix = 'Overlap: ';
 		this.m_OverlapText.text =  aPrefix + 'none';	
 		
-		this.checkOverlapForEachPath( aPrefix + 'blue', this.m_BluePath, inBall, this.m_OverlapText );
-		this.checkOverlapForEachPath( aPrefix + 'green', this.m_GreenPath, inBall, this.m_OverlapText );
-		this.checkOverlapForEachPath( aPrefix + 'red', this.m_RedPath, inBall, this.m_OverlapText );		
+		this.m_BlueOverLap = this.checkOverlapForEachPath( aPrefix + 'blue', this.m_BluePath, inBall, this.m_OverlapText );
+		this.m_GreenOverLap = this.checkOverlapForEachPath( aPrefix + 'green', this.m_GreenPath, inBall, this.m_OverlapText );
+		this.m_RedOverLap = this.checkOverlapForEachPath( aPrefix + 'red', this.m_RedPath, inBall, this.m_OverlapText );		
 	},
 	checkOverlapForEachPath: function( inText, inGroup, inBall, inOverLapText )
 	{
@@ -259,15 +262,20 @@ glassmarbles2.prototype =
 		
 		var aBoundsBall = inBall.getBounds();
 		
+		var aResult = false;
+		
 		inGroup.forEach( function( inPath )
 		{
 			aBounds = inPath.getBounds();
 			
 			if( Phaser.Rectangle.intersects( aBoundsBall, aBounds ) )
 			{
-				inOverLapText.text =  inText;			
+				inOverLapText.text =  inText;	
+				aResult = true;
 			}	
-		});		
+		});
+
+		return aResult;
 	},
 	collectBall: function( inPlayer, inBall )
 	{
@@ -310,7 +318,8 @@ glassmarbles2.prototype =
 			this.m_WaitToAddBallCounter = 0;
 			
 			var aBall = this.m_Balls.create( this.game.rnd.integerInRange( 335, 430 ), 10, 'balls-animates' );
-				
+			
+			aBall.anchor.setTo( 0.5, 6/7 );
 			aBall.body.setCircle( 9 );
 			aBall.body.fixedRotation = true;
 
@@ -318,7 +327,8 @@ glassmarbles2.prototype =
 			// We have specified the frame 0 but you can edit the image and add  because it's using every frame in the texture atlas
 			// name, frames, frameRate, loop 
 			aBall.animations.add( this.m_BallsAnimIdleName , [0], 10, true );
-			aBall.animations.add( this.m_BallsAnimDeathName, [1,2,3,4,5], 10, false );
+			// aBall.animations.add( this.m_BallsAnimDeathName, [1,2,3,4,5], 10, false );
+			aBall.animations.add( this.m_BallsAnimDeathName, [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15], 10, false );
 			
 			// And this starts the animation playing by using its key ("idle")
 			aBall.animations.play( this.m_BallsAnimIdleName );
