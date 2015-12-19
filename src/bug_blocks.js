@@ -409,7 +409,7 @@ Blockly.JavaScript['bug_addsprite'] = function( inBlock )
 // Glass Marble level 2   //
 //************************//
 
-function GotoColor( inColorVarName )
+function GotoColor( inColorPosVarName, inColorOverLapVarName )
 {
 	var aGetAnimFunc = "";
 	aGetAnimFunc +=	"getAnim = function( inSign )";
@@ -422,15 +422,15 @@ function GotoColor( inColorVarName )
 	aGetAnimFunc +=		"return aResult;";
 	aGetAnimFunc +=	"}";
 	
-	var aMembers = ["m_IsComingBack = false", "m_Count = 50", aGetAnimFunc];
+	var aMembers = ["m_IsComingBack = false", aGetAnimFunc];
 	
 	var aGoFunc = "";
 	//  Reset the players velocity (movement)
 	aGoFunc += "inState.m_Player.body.velocity.x = 0;"; 
 		
-	aGoFunc += "if( !this.m_IsComingBack && !inState.isCloseToPalyer( inState." + inColorVarName + " ) )";
+	aGoFunc += "if( !this.m_IsComingBack && !inState.isCloseToPalyer( inState." + inColorPosVarName + " ) )";
 	aGoFunc += "{";		
-	aGoFunc += 		"var aDirectionX = inState." + inColorVarName + " - inState.m_Player.body.x;";
+	aGoFunc += 		"var aDirectionX = inState." + inColorPosVarName + " - inState.m_Player.body.x;";
 	aGoFunc += 		"var aSign = Phaser.Math.sign( aDirectionX );";		
 	aGoFunc += 		"inState.m_Player.body.velocity.x = aSign * inState.m_PlayerVelocityX;"
 	aGoFunc += 		"inState.m_Player.animations.play( this.getAnim( aSign ) ) ;";							
@@ -438,19 +438,14 @@ function GotoColor( inColorVarName )
 	aGoFunc += "}";
 	aGoFunc += "else";
 	aGoFunc += "{";	
-	aGoFunc += 		"if( !this.m_IsComingBack )";
-	aGoFunc += 		"{"				
-	aGoFunc += 			"this.m_IsComingBack = true;";				
-	aGoFunc += 		"}";
-			
-	aGoFunc += 		"if( 0 < this.m_Count )"; // we wait before to coming back 
+	aGoFunc += 		"if( !this.m_IsComingBack && inState." + inColorOverLapVarName + " )";
 	aGoFunc += 		"{";
-	aGoFunc +=			"inState.m_Player.animations.play( 'idle' );";		
-	aGoFunc +=      	"this.m_Count--;";					
+	aGoFunc +=			"inState.m_Player.animations.play( 'idle' );";							
 	aGoFunc +=			"return true;";
 	aGoFunc += 		"}";
 	aGoFunc += 		"else";
 	aGoFunc += 		"{";	
+	aGoFunc += 			"this.m_IsComingBack = true;";	
 	aGoFunc += 			"if( !inState.isCloseToPalyer( inState.m_Origin ) )";
 	aGoFunc += 			"{";
 	aGoFunc += 				"var aDirectionX = inState.m_Origin - inState.m_Player.body.x;";	
@@ -488,7 +483,7 @@ Blockly.Blocks['bug_move_to_blue'] =
 
 Blockly.JavaScript['bug_move_to_blue'] = function( inBlock )
 {  
-	return GotoColor( "m_BluePos" );
+	return GotoColor( "m_BluePos", "m_BlueOverLap" );
 };
 
 /** Move to green @see index.html toolbox */
@@ -508,7 +503,7 @@ Blockly.Blocks['bug_move_to_green'] =
 
 Blockly.JavaScript['bug_move_to_green'] = function( inBlock )
 {  
-	return GotoColor( "m_GreenPos" );
+	return GotoColor( "m_GreenPos", "m_GreenOverLap"  );
 };
 
 /** Move to red @see index.html toolbox */
@@ -528,7 +523,7 @@ Blockly.Blocks['bug_move_to_red'] =
 
 Blockly.JavaScript['bug_move_to_red'] = function( inBlock )
 {  
-	return GotoColor( "m_RedPos" );
+	return GotoColor( "m_RedPos", "m_RedOverLap"  );
 };
 
 /** If the glass marble is COLORNAME */

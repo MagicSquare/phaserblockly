@@ -27,6 +27,7 @@ var glassmarbles2 = function( game )
 	this.m_ButtonQuit = null;	
 	
 	this.m_PhysicDebug = false;
+	this.m_BoundsDebug = false;
 	this.m_Gravity = 600.0;
 	
 	// Player Positions
@@ -63,12 +64,6 @@ glassmarbles2.prototype =
 		this.game.load.image( 'firstplan', 'assets/01_glassmarbles_01_firstplan.png' );
 		
 		this.game.load.image( 'rocks', 'assets/glassmarbles_01.png' );
-		
-		/*
-		this.game.load.image( 'path_green', 'assets/glassmarbles_01-green.png' );
-		this.game.load.image( 'path_blue', 'assets/glassmarbles_01-blue.png' );
-		this.game.load.image( 'path_red', 'assets/glassmarbles_01-red.png' ); 
-		*/
 		
 		this.game.load.physics( "sprite_physics", "assets/glassmarbles_01.json" );
 
@@ -178,19 +173,22 @@ glassmarbles2.prototype =
 	render: function()
 	{
 		//this.game.debug.text( "Group size: " + this.m_Balls.total, 32, 32 );
-		/*
-		var aDebugPaths = function( inPaths, inGame )
-		{
-			if( inPaths )
-			{
-				inPaths.forEach( inGame.debug.spriteBounds, inGame.debug );
-			}
-		};
 		
-		aDebugPaths( this.m_BluePath, this.game );
-		aDebugPaths( this.m_GreenPath, this.game );
-		aDebugPaths( this.m_RedPath, this.game );
-		*/
+		if( this.m_BoundsDebug )
+		{
+			var aDebugGroups = function( inPaths, inGame )
+			{
+				if( inPaths )
+				{
+					inPaths.forEach( inGame.debug.spriteBounds, inGame.debug );
+				}
+			};
+			
+			aDebugGroups( this.m_BluePath, this.game );
+			aDebugGroups( this.m_GreenPath, this.game );
+			aDebugGroups( this.m_RedPath, this.game );
+			aDebugGroups( this.m_Balls, this.game );
+		}
 	},	
 	getGoToState: function( inStateName )
 	{
@@ -253,7 +251,9 @@ glassmarbles2.prototype =
 		
 		this.m_BlueOverLap = this.checkOverlapForEachPath( aPrefix + 'blue', this.m_BluePath, inBall, this.m_OverlapText );
 		this.m_GreenOverLap = this.checkOverlapForEachPath( aPrefix + 'green', this.m_GreenPath, inBall, this.m_OverlapText );
-		this.m_RedOverLap = this.checkOverlapForEachPath( aPrefix + 'red', this.m_RedPath, inBall, this.m_OverlapText );		
+		this.m_RedOverLap = this.checkOverlapForEachPath( aPrefix + 'red', this.m_RedPath, inBall, this.m_OverlapText );	
+
+		//console.log( 'blue : ' + this.m_BlueOverLap + ' green :' + this.m_GreenOverLap + ' red :' + this.m_RedOverLap );
 	},
 	checkOverlapForEachPath: function( inText, inGroup, inBall, inOverLapText )
 	{
@@ -298,18 +298,20 @@ glassmarbles2.prototype =
 		this.m_ScoreText.text = 'Score: ' + this.m_Score;
 	},
 	crashBall: function( inGround, inBall )
-	{		
-		/*
-		this.m_GameOverText.visible = true;
-		
-		this.m_MaxBallsLenght = 0;
-		this.m_LoopAddBalls.delay = 500000;
-		*/
-		// The paused state of the Game. A paused game doesn't update any of its
-		// subsystems.
-		// When a game is paused the onPause event is dispatched. When it is 
-		// resumed the onResume event is dispatched.
-		// this.game.pause = true;
+	{	
+		if( inBall.sprite.animations.currentAnim.name != this.m_BallsAnimDeathName )
+		{
+			this.m_GameOverText.visible = true;
+			
+			this.m_MaxBallsLenght = 200;
+			this.m_LoopAddBalls.delay = 20;
+
+			// The paused state of the Game. A paused game doesn't update any of its
+			// subsystems.
+			// When a game is paused the onPause event is dispatched. When it is 
+			// resumed the onResume event is dispatched.
+			// this.game.pause = true;
+		}
 	},
 	createBalls: function()
 	{
@@ -343,7 +345,7 @@ glassmarbles2.prototype =
 	},
 	isCloseToPalyer: function( inPositionX )
 	{
-		var aEpsilon = 4;
+		var aEpsilon = 10;
 		
 		return Math.abs( this.m_Player.body.x - inPositionX ) < aEpsilon; 
 	}
